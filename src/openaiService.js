@@ -3,7 +3,6 @@ import OpenAI from 'openai';
 
 const openai = new OpenAI({
   apiKey: process.env.REACT_APP_OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true
 });
 
 const queryTurbo = async (prompt, messages) => {
@@ -22,5 +21,4 @@ const queryTurbo = async (prompt, messages) => {
   }
 };
 
-console.log(openai.apiKey);
 export default queryTurbo;
