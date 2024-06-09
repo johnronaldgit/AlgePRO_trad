@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+.bg-darkblue {
+  background-color: #0a0a23; /* Adjust the color to match your design */
+}
+
+.text-white {
+  color: #ffffff;
+}
+
+.text-yellow {
+  color: #ffc107; /* Adjust the color to match your design */
+}
+
+.bg-yellow-500 {
+  background-color: #ffc107; /* Adjust the color to match your design */
+}
+
+.hover\:bg-yellow-600:hover {
+  background-color: #ffca28; /* Adjust the color to match your design */
+}
+.bg-darkblue {
+  background-color: #0a0a23; /* Adjust the color to match your design */
+}
+
+.text-darkblue {
+  color: #0a0a23;
+}
+
+.bg-blue-200 {
+  background-color: #cfe3fc; /* Adjust the color to match your design */
+}
+.fixed-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 16rem; /* Adjust width as needed */
+  background-color: #0a0a23; /* Adjust color to match your design */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sidebar-content {
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.content {
+  margin-left: 16rem; /* Same as sidebar width */
+  padding: 1rem;
+}
+/* src/index.css */
+
+/* Ensure the Markdown content has a transparent background and appropriate text color */
+.markdown-body {
+  background-color: transparent;
+  color: black; /* Ensure text color is appropriate */
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  color: black; /* Ensure header text color is appropriate */
+}
+.markdown-body h1 {
+  font-size: 2em;
+  margin-top: 0.67em;
+  margin-bottom: 0.67em;
+}
+
+.markdown-body h2 {
+  font-size: 1.5em;
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+.markdown-body h3 {
+  font-size: 1.17em;
+  margin-top: 0.83em;
+  margin-bottom: 0.83em;
+}
+
+.markdown-body h4 {
+  font-size: 1em;
+  margin-top: 1.12em;
+  margin-bottom: 1.12em;
+}
+
+.markdown-body h5 {
+  font-size: 0.83em;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+.markdown-body h6 {
+  font-size: 0.75em;
+  margin-top: 1.75em;
+  margin-bottom: 1.75em;
+}
+
+.markdown-body pre,
+.markdown-body code {
+  background-color: #f6f8fa; /* Optional: set a light background color for code blocks */
+  color: black; /* Ensure code text color is appropriate */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
