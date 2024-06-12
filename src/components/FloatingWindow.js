@@ -1,6 +1,8 @@
-// src/components/FloatingWindow.js
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import 'tailwindcss/tailwind.css';
+import { TrashIcon } from '@heroicons/react/24/solid'; // Import the v2 Trash icon
+import { auth, db } from '../firebaseConfig'; // Import Firebase
+import { collection, addDoc, getDocs, query, orderBy, writeBatch } from 'firebase/firestore';
 
 const FloatingWindow = ({ onClose }) => {
   const [dimensions, setDimensions] = useState({ width: 384, height: 500 });
@@ -9,6 +11,30 @@ const FloatingWindow = ({ onClose }) => {
   const windowRef = useRef(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(true); // Add a loading state
+  const user = auth.currentUser;
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      if (!user) return;
+
+      const userRef = collection(db, 'users', user.email, 'messages');
+      const q = query(userRef, orderBy('timestamp', 'asc'));
+      const querySnapshot = await getDocs(q);
+
+      const fetchedMessages = [];
+      querySnapshot.forEach((doc) => {
+        fetchedMessages.push({ id: doc.id, ...doc.data() });
+      });
+
+      setMessages(fetchedMessages);
+      setLoading(false); // Set loading to false after messages are fetched
+    };
+
+    if (user) {
+      fetchMessages();
+    }
+  }, [user]);
 
   const startResize = (e, direction) => {
     e.preventDefault();
@@ -57,6 +83,18 @@ const FloatingWindow = ({ onClose }) => {
     };
   }, [isResizing, resize, stopResize]);
 
+  const saveMessageToFirebase = async (message) => {
+    if (!user) return;
+
+    const userRef = collection(db, 'users', user.email, 'messages');
+
+    await addDoc(userRef, {
+      role: message.role,
+      content: message.content,
+      timestamp: new Date(),
+    });
+  };
+
   const handleSendMessage = async () => {
     if (!input.trim()) return;
 
@@ -64,6 +102,8 @@ const FloatingWindow = ({ onClose }) => {
     const updatedMessages = [...messages, newMessage];
     setMessages(updatedMessages);
     setInput('');
+
+    saveMessageToFirebase(newMessage);
 
     try {
       const response = await fetch('/api/chat', {
@@ -81,11 +121,32 @@ const FloatingWindow = ({ onClose }) => {
       const data = await response.json();
       const responseMessage = { role: 'assistant', content: data.message };
       setMessages((prevMessages) => [...prevMessages, responseMessage]);
+
+      saveMessageToFirebase(responseMessage);
     } catch (error) {
       console.error('Error:', error);
       const errorMessage = { role: 'assistant', content: 'Sorry, something went wrong. Please try again later.' };
       setMessages((prevMessages) => [...prevMessages, errorMessage]);
+
+      saveMessageToFirebase(errorMessage);
     }
+  };
+
+  const handleClearMessages = async () => {
+    if (!user) return;
+
+    const userRef = collection(db, 'users', user.email, 'messages');
+    const q = query(userRef);
+    const querySnapshot = await getDocs(q);
+
+    const batch = writeBatch(db); // Corrected here
+    querySnapshot.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+
+    await batch.commit();
+
+    setMessages([]);
   };
 
   return (
@@ -99,22 +160,38 @@ const FloatingWindow = ({ onClose }) => {
         <button onClick={onClose} className="text-red-500">X</button>
       </div>
       <div className="flex-1 overflow-y-auto no-scrollbar">
-        {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center text-white">
-            <img src="/algeprologo.png" alt="AlgePRO Logo" className="w-40 h-40 mb-4" />
-            <h2 className="text-3xl font-bold mb-2">Hi!</h2>
-            <p className="text-lg mb-4">How can I help you today?</p>
+        {loading ? (
+          <div className="flex justify-center items-center h-full">
+            <div className="loader"></div> {/* Add a loader */}
           </div>
-        )}
-        <div className="w-full flex flex-col space-y-2 px-4">
-          {messages.map((message, index) => (
-            <div key={index} className={`p-2 rounded-lg ${message.role === 'user' ? 'bg-blue-500 text-white self-end rounded-2xl' : 'bg-gray-300 text-black self-start rounded-2xl'}`}>
-              {message.content}
+        ) : (
+          <>
+            {messages.length === 0 && (
+              <div className="flex flex-col items-center justify-center text-white">
+                <img src="/algeprologo.png" alt="AlgePRO Logo" className="w-40 h-40 mb-4" />
+                <h2 className="text-3xl font-bold mb-2">Hi!</h2>
+                <p className="text-lg mb-4">How can I help you today?</p>
+              </div>
+            )}
+            <div className="w-full flex flex-col space-y-4 px-4">
+              {messages.map((message, index) => (
+                <div key={index} className="flex flex-col">
+                  <div className={`text-xs font-semibold mb-1 ${message.role === 'user' ? 'self-end text-blue-300' : 'self-start text-gray-400'}`}>
+                    {message.role === 'user' ? 'User' : 'AlgePRO'}
+                  </div>
+                  <div className={`p-2 rounded-lg ${message.role === 'user' ? 'bg-blue-500 text-white self-end rounded-2xl' : 'bg-gray-300 text-black self-start rounded-2xl'}`}>
+                    {message.content}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </>
+        )}
       </div>
       <div className="w-full flex items-center mt-3 p-3 space-x-2">
+        <button onClick={handleClearMessages} className="p-2 bg-red-500 text-white rounded-full">
+          <TrashIcon className="w-5 h-5" />
+        </button>
         <input
           type="text"
           value={input}

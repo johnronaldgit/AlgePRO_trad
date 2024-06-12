@@ -12,11 +12,13 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "firebase": "^10.12.1",
     "firebase-admin": "^12.1.1",
     "github-markdown-css": "^5.5.1",
     "katex": "^0.16.10",
-    "openai": "^4.49.1",
+    "openai": "^4.50.0",
     "pdfjs-dist": "^2.16.105",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -38,7 +40,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "server": "node server.js"
   },
   "eslintConfig": {
     "extends": [

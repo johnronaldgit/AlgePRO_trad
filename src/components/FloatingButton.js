@@ -1,14 +1,24 @@
 // src/components/FloatingButton.js
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import 'tailwindcss/tailwind.css';
 import FloatingWindow from './FloatingWindow'; // Import the FloatingWindow component
 
 const FloatingButton = () => {
   const [showWindow, setShowWindow] = useState(false);
+  const location = useLocation();
 
   const toggleWindow = () => {
     setShowWindow(!showWindow);
   };
+
+  // Check if the current path includes "pre-test" or "post-test"
+  const isTestPage = location.pathname.includes('pre-test') || location.pathname.includes('post-test');
+
+  // Render the button and window only if not on test pages
+  if (isTestPage) {
+    return null;
+  }
 
   return (
     <>

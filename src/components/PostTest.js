@@ -1,4 +1,3 @@
-// src/components/PostTest.js
 import React, { useState, useEffect } from 'react';
 import MathJax from 'react-mathjax2';
 import { db, auth } from '../firebaseConfig';
@@ -88,10 +87,10 @@ function PostTest({ lessonNumber }) {
   const saveScore = async () => {
     const user = auth.currentUser;
     if (user) {
-      const userId = user.uid;
-      const lesson = `lesson${lessonNumber}`;
-      const userDocRef = doc(db, 'users', userId);
-      const scoresRef = doc(userDocRef, 'postScores', lesson);
+      const userEmail = user.email;
+      const lesson = `Post-Test Scores`; // Updated here
+      const userDocRef = doc(db, 'users', userEmail);
+      const scoresRef = doc(userDocRef, 'scores', lesson);
 
       try {
         await setDoc(scoresRef, {

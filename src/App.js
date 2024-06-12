@@ -1,4 +1,3 @@
-// src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './components/Home';
@@ -10,9 +9,7 @@ import Subtopic from './components/Subtopic';
 import PreTest from './components/PreTest';
 import PostTest from './components/PostTest';
 import Layout from './components/Layout';
-import Profile from './components/Profile'; // Import Profile component
-import Help from './components/Help'; // Import Help component
-import About from './components/About'; // Import About component
+import FloatingButton from './components/FloatingButton'; // Import FloatingButton
 
 const lessons = [
   {
@@ -61,8 +58,8 @@ function App() {
               element={<Lesson lessonNumber={`${lesson + 1}`} />}
             />
           ))}
-          <Route path="/lesson/6-7" element={<Lesson lessonNumber="6 & 7" />} />
-          <Route path="/lesson/8-9" element={<Lesson lessonNumber="8 & 9" />} />
+          <Route path="/lesson/6-7" element={<Lesson lessonNumber="6-7" />} />
+          <Route path="/lesson/8-9" element={<Lesson lessonNumber="8-9" />} />
           {lessons.map((lesson, lessonIndex) =>
             lesson.subtopics.map((subtopic, subIndex) => (
               <Route
@@ -73,7 +70,7 @@ function App() {
             ))
           )}
           {lessons.map((lesson) => (
-            <>
+            <React.Fragment key={`tests-${lesson.number}`}>
               <Route
                 key={`pre-${lesson.number}`}
                 path={`/lesson/${lesson.number}/pre-test`}
@@ -84,13 +81,11 @@ function App() {
                 path={`/lesson/${lesson.number}/post-test`}
                 element={<PostTest lessonNumber={lesson.number} />}
               />
-            </>
+            </React.Fragment>
           ))}
-          <Route path="/profile" element={<Profile />} /> {/* Add Profile route */}
-          <Route path="/help" element={<Help />} /> {/* Add Help route */}
-          <Route path="/about" element={<About />} /> {/* Add About Us route */}
         </Route>
       </Routes>
+      <FloatingButton /> {/* Include FloatingButton here */}
     </Router>
   );
 }
