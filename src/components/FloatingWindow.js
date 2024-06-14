@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import 'tailwindcss/tailwind.css';
-import { TrashIcon } from '@heroicons/react/24/solid'; // Import the v2 Trash icon
-import { auth, db } from '../firebaseConfig'; // Import Firebase
+import { TrashIcon } from '@heroicons/react/24/solid';
+import { auth, db } from '../firebaseConfig';
 import { collection, addDoc, getDocs, query, orderBy, writeBatch } from 'firebase/firestore';
+import MathJax from 'react-mathjax2';
 
 const FloatingWindow = ({ onClose }) => {
   const [dimensions, setDimensions] = useState({ width: 384, height: 500 });
@@ -11,7 +12,7 @@ const FloatingWindow = ({ onClose }) => {
   const windowRef = useRef(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(true); // Add a loading state
+  const [loading, setLoading] = useState(true);
   const user = auth.currentUser;
 
   useEffect(() => {
@@ -28,7 +29,7 @@ const FloatingWindow = ({ onClose }) => {
       });
 
       setMessages(fetchedMessages);
-      setLoading(false); // Set loading to false after messages are fetched
+      setLoading(false);
     };
 
     if (user) {
@@ -139,7 +140,7 @@ const FloatingWindow = ({ onClose }) => {
     const q = query(userRef);
     const querySnapshot = await getDocs(q);
 
-    const batch = writeBatch(db); // Corrected here
+    const batch = writeBatch(db);
     querySnapshot.forEach((doc) => {
       batch.delete(doc.ref);
     });
@@ -162,7 +163,7 @@ const FloatingWindow = ({ onClose }) => {
       <div className="flex-1 overflow-y-auto no-scrollbar">
         {loading ? (
           <div className="flex justify-center items-center h-full">
-            <div className="loader"></div> {/* Add a loader */}
+            <div className="loader"></div>
           </div>
         ) : (
           <>
@@ -180,7 +181,13 @@ const FloatingWindow = ({ onClose }) => {
                     {message.role === 'user' ? 'User' : 'AlgePRO'}
                   </div>
                   <div className={`p-2 rounded-lg ${message.role === 'user' ? 'bg-blue-500 text-white self-end rounded-2xl' : 'bg-gray-300 text-black self-start rounded-2xl'}`}>
-                    {message.content}
+                    {message.role === 'assistant' ? (
+                      <MathJax.Context input="tex">
+                        <MathJax.Text text={message.content} />
+                      </MathJax.Context>
+                    ) : (
+                      message.content
+                    )}
                   </div>
                 </div>
               ))}
