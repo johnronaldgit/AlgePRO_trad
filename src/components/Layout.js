@@ -4,8 +4,8 @@ import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { auth } from '../firebaseConfig';
 import { ChevronDownIcon, ChevronRightIcon, HomeIcon, BookOpenIcon, BoltIcon, DocumentTextIcon } from '@heroicons/react/20/solid';
 import 'tailwindcss/tailwind.css';
-import Navbar from './Navbar'; // Import the Navbar component
-import FloatingButton from './FloatingButton'; // Import the FloatingButton component
+import Navbar from './Navbar';
+import FloatingButton from './FloatingButton';
 
 const lessons = [
   {
@@ -67,35 +67,25 @@ function Layout() {
     setOpenLesson(openLesson === lessonNumber ? null : lessonNumber);
   };
 
-  const isActive = (path) => {
-    return location.pathname === path;
-  };
+  const isActive = (path) => location.pathname === path;
 
-  const isLessonActive = (lessonNumber) => {
-    const lessonPath = `/lesson/${lessonNumber.replace(' & ', '-')}`;
-    return location.pathname.includes(lessonPath);
-  };
+  const isLessonActive = (lessonNumber) => location.pathname.includes(`/lesson/${lessonNumber.replace(' & ', '-')}`);
 
-  const getLessonPath = (lessonNumber) => {
-    return lessonNumber.includes('&') ? lessonNumber.replace(' & ', '-') : lessonNumber;
-  };
+  const getLessonPath = (lessonNumber) => lessonNumber.includes('&') ? lessonNumber.replace(' & ', '-') : lessonNumber;
 
-  const toggleSidebar = () => {
-    setSidebarVisible(!sidebarVisible);
-  };
+  const toggleSidebar = () => setSidebarVisible(!sidebarVisible);
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Navbar toggleSidebar={toggleSidebar} /> {/* Add Navbar component with toggleSidebar prop */}
-      <div className="flex flex-1 pt-16"> {/* Add padding-top to account for the fixed Navbar */}
-        {/* Sidebar */}
+      <Navbar toggleSidebar={toggleSidebar} />
+      <div className="flex flex-1 pt-16">
         {sidebarVisible && (
-          <div className="fixed top-16 bottom-0 bg-darkblue text-white w-64 flex flex-col justify-between overflow-y-auto z-40"> {/* Ensure the sidebar extends from top to bottom */}
+          <div className="fixed top-16 bottom-0 bg-darkblue text-white w-64 flex flex-col justify-between overflow-y-auto">
             <nav className="sidebar-content p-4 flex-grow">
               <ul>
                 <li className={`mb-4 ${isActive('/dashboard') ? 'bg-[#D7A700] rounded-lg opacity-75 p-2 text-black' : ''}`}>
                   <Link to="/dashboard" className={`flex items-center hover:text-white ${isActive('/dashboard') ? 'text-black' : ''}`}>
-                    <HomeIcon className="w-5 h-5 mr-2 flex-shrink-0" /> {/* Added flex-shrink-0 */}
+                    <HomeIcon className="w-5 h-5 mr-2 flex-shrink-0" />
                     <span className="text-lg">Dashboard</span>
                   </Link>
                 </li>
@@ -106,7 +96,7 @@ function Layout() {
                       onClick={() => toggleLesson(lesson.number)}
                       className={`flex items-center w-full text-left hover:text-white ${openLesson === lesson.number || isLessonActive(lesson.number) ? 'bg-[#D7A700] rounded-lg opacity-75 p-2 text-black' : ''}`}
                     >
-                      <BookOpenIcon className="w-5 h-5 mr-2 flex-shrink-0" /> {/* Added flex-shrink-0 */}
+                      <BookOpenIcon className="w-5 h-5 mr-2 flex-shrink-0" />
                       <span className="text-lg flex-1">Lesson {lesson.number}</span>
                       {openLesson === lesson.number ? (
                         <ChevronDownIcon className="w-5 h-5 ml-2 flex-shrink-0" />
@@ -117,31 +107,22 @@ function Layout() {
                     {openLesson === lesson.number && (
                       <ul className="ml-4 mt-2">
                         <li className={`mb-2 ${isActive(`/lesson/${getLessonPath(lesson.number)}/pre-test`) ? 'bg-[#D7A700] rounded-lg opacity-75 p-2 text-black' : ''}`}>
-                          <Link
-                            to={`/lesson/${getLessonPath(lesson.number)}/pre-test`}
-                            className={`flex items-center hover:text-white ${isActive(`/lesson/${getLessonPath(lesson.number)}/pre-test`) ? 'text-black' : ''}`}
-                          >
-                            <BoltIcon className="w-5 h-5 mr-2 flex-shrink-0" /> {/* Added flex-shrink-0 */}
+                          <Link to={`/lesson/${getLessonPath(lesson.number)}/pre-test`} className={`flex items-center hover:text-white ${isActive(`/lesson/${getLessonPath(lesson.number)}/pre-test`) ? 'text-black' : ''}`}>
+                            <BoltIcon className="w-5 h-5 mr-2 flex-shrink-0" />
                             Pre-test
                           </Link>
                         </li>
                         {lesson.subtopics.map((subtopic, subIndex) => (
                           <li key={subIndex} className={`mb-2 ${isActive(`/lesson/${getLessonPath(lesson.number)}/subtopic/${subIndex + 1}`) ? 'bg-[#D7A700] rounded-lg opacity-75 p-2 text-black' : ''}`}>
-                            <Link
-                              to={`/lesson/${getLessonPath(lesson.number)}/subtopic/${subIndex + 1}`}
-                              className={`flex items-center hover:text-white ${isActive(`/lesson/${getLessonPath(lesson.number)}/subtopic/${subIndex + 1}`) ? 'text-black' : ''}`}
-                            >
-                              <DocumentTextIcon className="w-5 h-5 mr-2 flex-shrink-0" /> {/* Added flex-shrink-0 */}
+                            <Link to={`/lesson/${getLessonPath(lesson.number)}/subtopic/${subIndex + 1}`} className={`flex items-center hover:text-white ${isActive(`/lesson/${getLessonPath(lesson.number)}/subtopic/${subIndex + 1}`) ? 'text-black' : ''}`}>
+                              <DocumentTextIcon className="w-5 h-5 mr-2 flex-shrink-0" />
                               {subtopic}
                             </Link>
                           </li>
                         ))}
                         <li className={`mb-2 ${isActive(`/lesson/${getLessonPath(lesson.number)}/post-test`) ? 'bg-[#D7A700] rounded-lg opacity-75 p-2 text-black' : ''}`}>
-                          <Link
-                            to={`/lesson/${getLessonPath(lesson.number)}/post-test`}
-                            className={`flex items-center hover:text-white ${isActive(`/lesson/${getLessonPath(lesson.number)}/post-test`) ? 'text-black' : ''}`}
-                          >
-                            <BoltIcon className="w-5 h-5 mr-2 flex-shrink-0" /> {/* Added flex-shrink-0 */}
+                          <Link to={`/lesson/${getLessonPath(lesson.number)}/post-test`} className={`flex items-center hover:text-white ${isActive(`/lesson/${getLessonPath(lesson.number)}/post-test`) ? 'text-black' : ''}`}>
+                            <BoltIcon className="w-5 h-5 mr-2 flex-shrink-0" />
                             Post-test
                           </Link>
                         </li>
@@ -168,11 +149,11 @@ function Layout() {
         )}
 
         {/* Main content */}
-        <div className={`flex-1 p-6 transition-all duration-300 ${sidebarVisible ? 'ml-64' : 'ml-0'}`}>
+        <div className={`flex-1 p-6 overflow-y-auto transition-all duration-300 ${sidebarVisible ? 'ml-64' : 'ml-0'}`}>
           <Outlet />
         </div>
       </div>
-      <FloatingButton /> {/* Add the FloatingButton component here */}
+      <FloatingButton />
     </div>
   );
 }

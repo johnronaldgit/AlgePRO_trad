@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MathJax from 'react-mathjax2';
 import { db, auth } from '../firebaseConfig';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, updateDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import questions from '../questions'; // Import questions from the separate file
 
@@ -88,20 +88,20 @@ function PreTest({ lessonNumber }) {
     const user = auth.currentUser;
     if (user) {
       const userEmail = user.email;
-      const lesson = `Pre-Test Scores`; // Updated here
+      const lesson = `lesson${lessonNumber}`;
       const userDocRef = doc(db, 'users', userEmail);
       const scoresRef = doc(userDocRef, 'scores', lesson);
 
       try {
-        await setDoc(scoresRef, {
-          correctCount,
-          incorrectCount,
-          totalQuestions: lessonQuestions.length,
-          timestamp: new Date()
-        });
-        console.log('Score saved successfully');
+        await updateDoc(scoresRef, {
+          PreTestScores: {
+            correctCount,
+            incorrectCount
+          }
+        }, { merge: true });
+        console.log('Pre-test score saved successfully');
       } catch (error) {
-        console.error('Error saving score:', error);
+        console.error('Error saving pre-test score:', error);
       }
     }
   };
