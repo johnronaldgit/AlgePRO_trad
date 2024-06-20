@@ -29,11 +29,11 @@ const lessons = [
     subtopics: ['Special Case on the Product of Binomial and Trinomial'],
   },
   {
-    number: '6-7',
+    number: '6',
     subtopics: ['Factoring Perfect Square Trinomial', 'Factoring Difference of Two Squares'],
   },
   {
-    number: '8-9',
+    number: '7',
     subtopics: ['Factoring Sum/Difference of Two Cubes', 'Factoring Quadratic Trinomial'],
   },
 ];

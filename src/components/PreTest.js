@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MathJax from 'react-mathjax2';
 import { db, auth } from '../firebaseConfig';
-import { doc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import questions from '../questions'; // Import questions from the separate file
 
@@ -15,10 +15,34 @@ function PreTest({ lessonNumber }) {
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(true);
+  const [hasCompletedPreTest, setHasCompletedPreTest] = useState(false);
+  const [completedTestData, setCompletedTestData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
 
   useEffect(() => {
+    const checkPreTestCompletion = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const userEmail = user.email;
+        const lesson = `lesson${lessonNumber}`;
+        const preTestDocRef = doc(db, 'users', userEmail, 'scores', lesson);
+
+        const preTestDoc = await getDoc(preTestDocRef);
+        if (preTestDoc.exists() && preTestDoc.data().PreTestScores) {
+          setHasCompletedPreTest(true);
+          setCompletedTestData(preTestDoc.data().PreTestScores);
+        } else {
+          setHasCompletedPreTest(false);
+          setCompletedTestData(null);
+        }
+      }
+      setIsLoading(false);
+    };
+
+    checkPreTestCompletion();
+
     // Reset state when lessonNumber changes
     setCurrentQuestionIndex(0);
     setAnswers([]);
@@ -29,6 +53,7 @@ function PreTest({ lessonNumber }) {
     setIsSubmitEnabled(false);
     setIsSubmitted(false);
     setShowConfirmation(true);
+    setIsLoading(true);
   }, [lessonNumber]);
 
   const lessonQuestions = questions[`lesson${lessonNumber}`];
@@ -89,14 +114,14 @@ function PreTest({ lessonNumber }) {
     if (user) {
       const userEmail = user.email;
       const lesson = `lesson${lessonNumber}`;
-      const userDocRef = doc(db, 'users', userEmail);
-      const scoresRef = doc(userDocRef, 'scores', lesson);
+      const scoresRef = doc(db, 'users', userEmail, 'scores', lesson);
 
       try {
-        await updateDoc(scoresRef, {
+        await setDoc(scoresRef, {
           PreTestScores: {
             correctCount,
-            incorrectCount
+            incorrectCount,
+            submittedAnswers
           }
         }, { merge: true });
         console.log('Pre-test score saved successfully');
@@ -142,7 +167,11 @@ function PreTest({ lessonNumber }) {
     );
   };
 
-  const renderResults = () => {
+  const renderResults = (resultsData) => {
+    if (!resultsData) return null;
+
+    const { correctCount, incorrectCount, submittedAnswers } = resultsData;
+
     return (
       <MathJax.Context input='tex'>
         <div>
@@ -171,6 +200,30 @@ function PreTest({ lessonNumber }) {
       </MathJax.Context>
     );
   };
+
+  if (isLoading) {
+    return (
+      <div className="bg-blue-200 p-6 rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold">Loading...</h2>
+      </div>
+    );
+  }
+
+  if (hasCompletedPreTest) {
+    return (
+      <div className="bg-blue-200 p-6 rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold">Pre-test Already Completed</h2>
+        <p className="mt-4">You have already completed the pre-test for Lesson {lessonNumber}.</p>
+        {renderResults(completedTestData)}
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="mt-6 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+        >
+          Go to Dashboard
+        </button>
+      </div>
+    );
+  }
 
   if (!lessonQuestions) {
     return <p>No questions available for this lesson.</p>;
@@ -227,7 +280,7 @@ function PreTest({ lessonNumber }) {
               </div>
             </>
           ) : (
-            renderResults()
+            renderResults({ correctCount, incorrectCount, submittedAnswers })
           )}
         </div>
       </section>

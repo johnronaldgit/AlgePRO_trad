@@ -1,4 +1,3 @@
-// src/components/Subtopic.js
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -17,48 +16,48 @@ const contentFiles = {
     "Square Of Trinomial": "/content/lesson2_square_of_trinomial.md",
   },
   "3": {
-    "Product Of Sum And Difference": "/content/lesson3_product_of_sum_and_difference.md",
+    "The Product of a Sum and Difference of the Same Two Terms": "/content/lesson3_product_of_sum_and_difference.md",
   },
   "4": {
     "Cube Of Binomials": "/content/lesson4_cube_of_binomials.md",
   },
   "5": {
-    "Special Case Product": "/content/lesson5_special_case_product.md",
+    "Special Case on the Product of Binomial and Trinomial": "/content/lesson5_special_case_product.md",
   },
-  "6-7": {
-    "Factoring Perfect Square Trinomial": "/content/lesson6_7_perfect_square_trinomial.md",
-    "Factoring Difference Of Two Squares": "/content/lesson6_7_difference_of_two_squares.md",
+  "6": {
+    "Factoring Perfect Square Trinomial": "/content/lesson6_perfect_square_trinomial.md",
+    "Factoring Difference Of Two Squares": "/content/lesson6_difference_of_two_squares.md",
   },
-  "8-9": {
-    "Factoring Sum Difference Of TwoCubes": "/content/lesson8_9_sum_difference_of_two_cubes.md",
-    "Factoring Quadratic Trinomial": "/content/lesson8_9_quadratic_trinomial.md",
+  "7": {
+    "Factoring Sum/Difference Of Two Cubes": "/content/lesson7_sum_difference_of_two_cubes.md",
+    "Factoring Quadratic Trinomial": "/content/lesson7_quadratic_trinomial.md",
   },
 };
 
 const videoIds = {
   "1": {
-    "Special Products": "_nMOgPUUg5Q", // Replace with actual video IDs
+    "Special Products": "bFtjG45-Udk", // Replace with actual video IDs
     "Square Of Binomials": "dQw4w9WgXcQ",
   },
   "2": {
-    "Square Of Trinomial": "dQw4w9WgXcQ",
+    "Square Of Trinomial": "f6yhfmW41wI&t=1s",
   },
   "3": {
-    "Product Of Sum And Difference": "dQw4w9WgXcQ",
+    "The Product of a Sum and Difference of the Same Two Terms": "dQw4w9WgXcQ",
   },
   "4": {
-    "Cube Of Binomials": "dQw4w9WgXcQ",
+    "Cube Of Binomials": "6QQJoDshUt8&t=13s",
   },
   "5": {
-    "Special Case Product": "dQw4w9WgXcQ",
+    "Special Case on the Product of Binomial and Trinomial": "6xYW7VJ0w2s",
   },
-  "6-7": {
-    "Factoring Perfect Square Trinomial": "dQw4w9WgXcQ",
-    "Factoring Difference Of Two Squares": "dQw4w9WgXcQ",
+  "6": {
+    "Factoring Perfect Square Trinomial": "f6yhfmW41wI",
+    "Factoring Difference Of Two Squares": "vvypGuPy6g2A",
   },
-  "8-9": {
-    "Factoring Sum Difference Of Two Cubes": "dQw4w9WgXcQ",
-    "Factoring Quadratic Trinomial": "dQw4w9WgXcQ",
+  "7": {
+    "Factoring Sum/Difference Of Two Cubes": "ADj8sGSjewg",
+    "Factoring Quadratic Trinomial": "-4jANGlJRSY",
   },
 };
 
@@ -72,10 +71,26 @@ function Subtopic({ lessonNumber, subtopic }) {
 
   useEffect(() => {
     const loadContent = async () => {
-      const contentUrl = contentFiles[lessonNumber][subtopic];
-      const response = await fetch(contentUrl);
-      const text = await response.text();
-      setContent(text);
+      const normalizedSubtopic = subtopic.toLowerCase().replace(/\s+/g, '');
+      const contentKey = Object.keys(contentFiles[lessonNumber]).find(key => 
+        key.toLowerCase().replace(/\s+/g, '') === normalizedSubtopic
+      );
+
+      if (contentKey) {
+        const contentUrl = contentFiles[lessonNumber][contentKey];
+        try {
+          const response = await fetch(contentUrl);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const text = await response.text();
+          setContent(text);
+        } catch (error) {
+          console.error(`Error fetching content: ${error.message}`);
+        }
+      } else {
+        console.error('Content key not found for subtopic:', subtopic);
+      }
     };
 
     if (selectedOption === 'Reading') {
@@ -84,8 +99,8 @@ function Subtopic({ lessonNumber, subtopic }) {
   }, [selectedOption, lessonNumber, subtopic]);
 
   return (
-    <div>
-      <header className="flex items-center justify-between">
+    <div className="flex flex-col h-full">
+      <header className="flex items-center justify-between p-4 bg-gray-100">
         <h1 className="text-3xl font-bold text-darkblue">Lesson {lessonNumber} - {subtopic}</h1>
         <div>
           <label htmlFor="learning-style" className="mr-2">Learning Style:</label>
@@ -101,8 +116,8 @@ function Subtopic({ lessonNumber, subtopic }) {
           </select>
         </div>
       </header>
-      <section className="mt-6">
-        <div className="border p-6">
+      <section className="flex-grow p-6 overflow-y-auto bg-white">
+        <div className="max-w-full">
           <h2 className="text-2xl font-bold text-center mb-4">{subtopic}</h2>
           {/* Add content based on selected option */}
           {selectedOption === 'Reading' && (

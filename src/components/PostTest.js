@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MathJax from 'react-mathjax2';
 import { db, auth } from '../firebaseConfig';
-import { doc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import postQuestions from '../postQuestions'; // Import post-test questions from the separate file
 
@@ -15,10 +15,34 @@ function PostTest({ lessonNumber }) {
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(true);
+  const [hasCompletedPostTest, setHasCompletedPostTest] = useState(false);
+  const [completedTestData, setCompletedTestData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
 
   useEffect(() => {
+    const checkPostTestCompletion = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const userEmail = user.email;
+        const lesson = `lesson${lessonNumber}`;
+        const postTestDocRef = doc(db, 'users', userEmail, 'scores', lesson);
+
+        const postTestDoc = await getDoc(postTestDocRef);
+        if (postTestDoc.exists() && postTestDoc.data().PostTestScores) {
+          setHasCompletedPostTest(true);
+          setCompletedTestData(postTestDoc.data().PostTestScores);
+        } else {
+          setHasCompletedPostTest(false);
+          setCompletedTestData(null);
+        }
+      }
+      setIsLoading(false);
+    };
+
+    checkPostTestCompletion();
+
     // Reset state when lessonNumber changes
     setCurrentQuestionIndex(0);
     setAnswers([]);
@@ -29,6 +53,7 @@ function PostTest({ lessonNumber }) {
     setIsSubmitEnabled(false);
     setIsSubmitted(false);
     setShowConfirmation(true);
+    setIsLoading(true);
   }, [lessonNumber]);
 
   const lessonQuestions = postQuestions[`lesson${lessonNumber}`];
@@ -89,14 +114,14 @@ function PostTest({ lessonNumber }) {
     if (user) {
       const userEmail = user.email;
       const lesson = `lesson${lessonNumber}`;
-      const userDocRef = doc(db, 'users', userEmail);
-      const scoresRef = doc(userDocRef, 'scores', lesson);
+      const scoresRef = doc(db, 'users', userEmail, 'scores', lesson);
 
       try {
-        await updateDoc(scoresRef, {
+        await setDoc(scoresRef, {
           PostTestScores: {
             correctCount,
-            incorrectCount
+            incorrectCount,
+            submittedAnswers
           }
         }, { merge: true });
         console.log('Post-test score saved successfully');
@@ -142,7 +167,11 @@ function PostTest({ lessonNumber }) {
     );
   };
 
-  const renderResults = () => {
+  const renderResults = (resultsData) => {
+    if (!resultsData) return null;
+
+    const { correctCount, incorrectCount, submittedAnswers } = resultsData;
+
     return (
       <MathJax.Context input='tex'>
         <div>
@@ -171,6 +200,30 @@ function PostTest({ lessonNumber }) {
       </MathJax.Context>
     );
   };
+
+  if (isLoading) {
+    return (
+      <div className="bg-blue-200 p-6 rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold">Loading...</h2>
+      </div>
+    );
+  }
+
+  if (hasCompletedPostTest) {
+    return (
+      <div className="bg-blue-200 p-6 rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold">Post-test Already Completed</h2>
+        <p className="mt-4">You have already completed the post-test for Lesson {lessonNumber}.</p>
+        {renderResults(completedTestData)}
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="mt-6 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+        >
+          Go to Dashboard
+        </button>
+      </div>
+    );
+  }
 
   if (!lessonQuestions) {
     return <p>No questions available for this lesson.</p>;
@@ -227,7 +280,7 @@ function PostTest({ lessonNumber }) {
               </div>
             </>
           ) : (
-            renderResults()
+            renderResults({ correctCount, incorrectCount, submittedAnswers })
           )}
         </div>
       </section>
