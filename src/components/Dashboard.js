@@ -2,9 +2,11 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Lottie from 'react-lottie';
 import backgroundImage from '../assets/background.png'; // Import the background image
+import { getDoc, doc } from 'firebase/firestore';
+import { auth, db } from '../firebaseConfig'; // Import Firebase config
 
 // Import Lottie animation JSON files
-import continueLearningAnimation from '../assets/continueLearning.json';
+import learningstyleAnimation from '../assets/learningstyle.json';
 import nextTopicAnimation from '../assets/nextTopic.json';
 import remainingLessonsAnimation from '../assets/remainingLessons.json';
 
@@ -22,6 +24,7 @@ const defaultOptions = (animationData, width, height) => ({
 
 function Dashboard() {
   const [animationSize, setAnimationSize] = useState({ width: 270, height: 270 });
+  const [learningStyle, setLearningStyle] = useState('');
   const animationContainerRef = useRef(null);
 
   useEffect(() => {
@@ -39,6 +42,29 @@ function Dashboard() {
     return () => {
       window.removeEventListener('resize', handleResize);
     };
+  }, []);
+
+  useEffect(() => {
+    const fetchLearningStyle = async () => {
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const docRef = doc(db, 'users', user.email);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const userData = docSnap.data();
+            const style = userData['Learning Style'];
+            setLearningStyle(style || 'Not determined');
+          } else {
+            console.error('No such document!');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching learning style:', error);
+      }
+    };
+
+    fetchLearningStyle();
   }, []);
 
   return (
@@ -66,9 +92,9 @@ function Dashboard() {
       <section className="w-full max-w-6xl text-center mt-12 mb-8 px-4 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> {/* Use grid for responsiveness */}
           <div ref={animationContainerRef} className="bg-white p-6 md:p-10 rounded-lg shadow-md flex flex-col items-center w-full"> {/* Increase padding */}
-            <Lottie options={defaultOptions(continueLearningAnimation, animationSize.width, animationSize.height)} /> {/* Set responsive animation size */}
-            <h2 className="text-xl sm:text-2xl font-semibold text-navy-blue mb-4">Continue Learning</h2>
-            <p className="text-base sm:text-lg text-navy-blue">Last Topic: XYZ</p>
+            <Lottie options={defaultOptions(learningstyleAnimation, animationSize.width, animationSize.height)} /> {/* Set responsive animation size */}
+            <h2 className="text-xl sm:text-2xl font-semibold text-navy-blue mb-4">Preferred Learning Style</h2>
+            <p className="text-2xl sm:text-3xl font-bold text-yellow-500">{learningStyle}</p> {/* Added styling */}
           </div>
           <div ref={animationContainerRef} className="bg-white p-6 md:p-10 rounded-lg shadow-md flex flex-col items-center w-full"> {/* Increase padding */}
             <Lottie options={defaultOptions(nextTopicAnimation, animationSize.width, animationSize.height)} /> {/* Set responsive animation size */}

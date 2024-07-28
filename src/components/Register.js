@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebaseConfig';
+import { doc, setDoc } from 'firebase/firestore'; // Import Firestore functions
+import { auth, db } from '../firebaseConfig'; // Import the Firestore instance
+import Questionnaire from './Questionnaire'; // Import the Questionnaire component
 import 'tailwindcss/tailwind.css';
 
 function Register() {
@@ -9,6 +11,8 @@ function Register() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [showQuestionnaire, setShowQuestionnaire] = useState(false);
+  const [learningStyle, setLearningStyle] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -19,14 +23,26 @@ function Register() {
     }
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      navigate('/login');
+      setShowQuestionnaire(true); // Show the questionnaire after successful registration
     } catch (error) {
       setError(error.message);
     }
   };
 
+  const handleQuestionnaireComplete = async (style) => {
+    setLearningStyle(style);
+
+    // Save learning style to Firestore
+    const userEmail = email;
+    const userDoc = doc(db, 'users', userEmail);
+    await setDoc(userDoc, { 'Learning Style': style }, { merge: true });
+
+    navigate('/login');
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-darkblue">
+      {showQuestionnaire && <Questionnaire onComplete={handleQuestionnaireComplete} />}
       <div className="text-center">
         <img src="/logo.png" alt="AlgePRO Logo" className="mx-auto mb-4 w-80 h-800" />
         <h1 className="text-5xl font-bold text-white mb-2">Learn Algebra with AlgePRO!</h1>

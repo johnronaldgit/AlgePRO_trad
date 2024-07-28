@@ -9,7 +9,8 @@ import Subtopic from './components/Subtopic';
 import PreTest from './components/PreTest';
 import PostTest from './components/PostTest';
 import Layout from './components/Layout';
-import FloatingButton from './components/FloatingButton'; // Import FloatingButton
+import FloatingButton from './components/FloatingButton';
+import PracticeQuestions from './components/PracticeQuestions'; // Import PracticeQuestions
 
 const lessons = [
   {
@@ -62,11 +63,16 @@ function App() {
           <Route path="/lesson/8-9" element={<Lesson lessonNumber="8-9" />} />
           {lessons.map((lesson, lessonIndex) =>
             lesson.subtopics.map((subtopic, subIndex) => (
-              <Route
-                key={`${lessonIndex}-${subIndex}`}
-                path={`/lesson/${lesson.number}/subtopic/${subIndex + 1}`}
-                element={<Subtopic lessonNumber={lesson.number} subtopic={subtopic} />}
-              />
+              <React.Fragment key={`${lessonIndex}-${subIndex}`}>
+                <Route
+                  path={`/lesson/${lesson.number}/subtopic/${subIndex + 1}`}
+                  element={<Subtopic lessonNumber={lesson.number} subtopic={subtopic} />}
+                />
+                <Route
+                  path={`/lesson/${lesson.number}/subtopic/${subtopic}/practice`}
+                  element={<PracticeQuestions />}
+                />
+              </React.Fragment>
             ))
           )}
           {lessons.map((lesson) => (

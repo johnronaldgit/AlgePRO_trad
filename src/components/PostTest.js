@@ -109,6 +109,16 @@ function PostTest({ lessonNumber }) {
     setIncorrectCount(incorrect);
   };
 
+  const determineKnowledgeLevel = (correctCount) => {
+    if (correctCount >= 0 && correctCount <= 3) {
+      return 'Beginner';
+    } else if (correctCount >= 4 && correctCount <= 7) {
+      return 'Intermediate';
+    } else if (correctCount >= 8 && correctCount <= 10) {
+      return 'Advanced';
+    }
+  };
+
   const saveScore = async () => {
     const user = auth.currentUser;
     if (user) {
@@ -116,14 +126,19 @@ function PostTest({ lessonNumber }) {
       const lesson = `lesson${lessonNumber}`;
       const scoresRef = doc(db, 'users', userEmail, 'scores', lesson);
 
+      // Determine knowledge level
+      const knowledgeLevel = determineKnowledgeLevel(correctCount);
+
       try {
         await setDoc(scoresRef, {
           PostTestScores: {
             correctCount,
             incorrectCount,
             submittedAnswers
-          }
+          },
+          knowledgeLevel
         }, { merge: true });
+
         console.log('Post-test score saved successfully');
       } catch (error) {
         console.error('Error saving post-test score:', error);
@@ -176,7 +191,7 @@ function PostTest({ lessonNumber }) {
       <MathJax.Context input='tex'>
         <div>
           <h2 className="text-2xl font-bold">Test Completed</h2>
-          <p className="mt-4">Total Score: {correctCount} out of {lessonQuestions.length}</p>
+          <p className="mt-4">Total Score: {correctCount} out of 10</p>
           <p className="mt-2">Correct Answers: {correctCount}</p>
           <p className="mt-2">Incorrect Answers: {incorrectCount}</p>
           <div className="mt-6">

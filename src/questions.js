@@ -27,7 +27,7 @@ const questions = {
         correctAnswer: "c) \\(16x^2 - \\frac{1}{9}\\)"
       },
       {
-        question: "Find the missing term: \\((\\frac{3}{2}x - 2)^2 = \\frac{9}{4}x^2 + _____ + 4\\).",
+        question: "Find the missing term: \\((\\frac{3}{2}x - 2)^2\\) = \\((\\frac{9}{4}x^2 +\\) _____ \\(+ 4\\)).",
         options: ["a) -6", "b) +6", "c) -3", "d) +3"],
         correctAnswer: "a) -6"
       },

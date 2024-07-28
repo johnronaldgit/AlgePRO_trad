@@ -6,6 +6,9 @@ import rehypeKatex from 'rehype-katex';
 import YouTube from 'react-youtube';
 import 'katex/dist/katex.min.css';
 import '../index.css'; // Ensure index.css is imported
+import { useNavigate, useParams } from 'react-router-dom';
+import { getDoc, doc } from 'firebase/firestore';
+import { auth, db } from '../firebaseConfig';
 
 const contentFiles = {
   "1": {
@@ -62,17 +65,45 @@ const videoIds = {
 };
 
 function Subtopic({ lessonNumber, subtopic }) {
-  const [selectedOption, setSelectedOption] = useState('Reading');
+  const [selectedOption, setSelectedOption] = useState('');
   const [content, setContent] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+  const { subtopicIndex } = useParams();
 
-  const handleDropdownChange = (event) => {
-    setSelectedOption(event.target.value);
-  };
+  const subtopics = Object.keys(contentFiles[lessonNumber]);
+  const currentIndex = subtopics.indexOf(subtopic);
+  const nextSubtopic = currentIndex < subtopics.length - 1 ? subtopics[currentIndex + 1] : null;
+
+  useEffect(() => {
+    const fetchLearningStyle = async () => {
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const docRef = doc(db, 'users', user.email);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const userData = docSnap.data();
+            const learningStyle = userData['Learning Style'];
+            setSelectedOption(learningStyle || 'Reading');
+          } else {
+            console.error('No such document!');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching learning style:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchLearningStyle();
+  }, []);
 
   useEffect(() => {
     const loadContent = async () => {
       const normalizedSubtopic = subtopic.toLowerCase().replace(/\s+/g, '');
-      const contentKey = Object.keys(contentFiles[lessonNumber]).find(key => 
+      const contentKey = Object.keys(contentFiles[lessonNumber]).find(key =>
         key.toLowerCase().replace(/\s+/g, '') === normalizedSubtopic
       );
 
@@ -93,55 +124,92 @@ function Subtopic({ lessonNumber, subtopic }) {
       }
     };
 
-    if (selectedOption === 'Reading') {
+    if (selectedOption) {
       loadContent();
     }
   }, [selectedOption, lessonNumber, subtopic]);
 
+  const handleDropdownChange = (event) => {
+    setSelectedOption(event.target.value);
+  };
+
+  const handlePracticeQuestionsClick = () => {
+    navigate(`/lesson/${lessonNumber}/subtopic/${subtopic}/practice`);
+  };
+
   return (
     <div className="flex flex-col h-full">
-      <header className="flex items-center justify-between p-4 bg-gray-100">
-        <h1 className="text-3xl font-bold text-darkblue">Lesson {lessonNumber} - {subtopic}</h1>
-        <div>
-          <label htmlFor="learning-style" className="mr-2">Learning Style:</label>
-          <select 
-            id="learning-style" 
-            value={selectedOption} 
-            onChange={handleDropdownChange}
-            className="border border-gray-300 rounded-md p-2"
-          >
-            <option value="Reading">Reading</option>
-            <option value="Visual">Visual</option>
-            <option value="Audio">Audio</option>
-          </select>
+      {isLoading ? (
+        <div className="flex justify-center items-center h-full">
+          <div className="loader"></div> {/* Add your loader animation here */}
+          <style>{`
+            .loader {
+              border: 16px solid #f3f3f3; /* Light grey */
+              border-top: 16px solid #3498db; /* Blue */
+              border-radius: 50%;
+              width: 120px;
+              height: 120px;
+              animation: spin 2s linear infinite;
+            }
+
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}</style>
         </div>
-      </header>
-      <section className="flex-grow p-6 overflow-y-auto bg-white">
-        <div className="max-w-full">
-          <h2 className="text-2xl font-bold text-center mb-4">{subtopic}</h2>
-          {/* Add content based on selected option */}
-          {selectedOption === 'Reading' && (
-            <div className="markdown-body">
-              <ReactMarkdown
-                children={content}
-                remarkPlugins={[remarkGfm, remarkMath]}
-                rehypePlugins={[rehypeKatex]}
-              />
-            </div>
-          )}
-          {selectedOption === 'Visual' && (
-            <div className="flex justify-center">
-              <YouTube videoId={videoIds[lessonNumber][subtopic]} />
-            </div>
-          )}
-          {selectedOption === 'Audio' && (
+      ) : (
+        <>
+          <header className="flex items-center justify-between p-4 bg-gray-100">
+            <h1 className="text-3xl font-bold text-darkblue">Lesson {lessonNumber} - {subtopic}</h1>
             <div>
-              <p>Audio content for {subtopic}.</p>
-              {/* Add audio content here, such as audio clips or instructions */}
+              <label htmlFor="learning-style" className="mr-2">Learning Style:</label>
+              <select 
+                id="learning-style" 
+                value={selectedOption} 
+                onChange={handleDropdownChange}
+                className="border border-gray-300 rounded-md p-2"
+              >
+                <option value="Reading">Reading</option>
+                <option value="Visual">Visual</option>
+                <option value="Audio">Audio</option>
+              </select>
             </div>
-          )}
-        </div>
-      </section>
+          </header>
+          <section className="flex-grow p-6 overflow-y-auto bg-white">
+            <div className="max-w-full">
+              <h2 className="text-2xl font-bold text-center mb-4">{subtopic}</h2>
+              {selectedOption === 'Reading' && (
+                <div className="markdown-body">
+                  <ReactMarkdown
+                    children={content}
+                    remarkPlugins={[remarkGfm, remarkMath]}
+                    rehypePlugins={[rehypeKatex]}
+                  />
+                </div>
+              )}
+              {selectedOption === 'Visual' && (
+                <div className="flex justify-center">
+                  <YouTube videoId={videoIds[lessonNumber][subtopic]} />
+                </div>
+              )}
+              {selectedOption === 'Audio' && (
+                <div>
+                  <p>Audio content for {subtopic}.</p>
+                </div>
+              )}
+            </div>
+          </section>
+          <footer className="flex justify-center p-4 bg-gray-100">
+            <button
+              onClick={handlePracticeQuestionsClick}
+              className="px-4 py-2 bg-yellow-500 text-black rounded-md hover:bg-yellow-600"
+            >
+              Practice Questions
+            </button>
+          </footer>
+        </>
+      )}
     </div>
   );
 }
