@@ -10,7 +10,10 @@ import PreTest from './components/PreTest';
 import PostTest from './components/PostTest';
 import Layout from './components/Layout';
 import FloatingButton from './components/FloatingButton';
-import PracticeQuestions from './components/PracticeQuestions'; // Import PracticeQuestions
+import PracticeQuestions from './components/PracticeQuestions';
+import About from './components/About'; // Import the About component
+import Help from './components/Help'; // Import the Help component
+import Profile from './components/Profile'; // Import the Profile component
 
 const lessons = [
   {
@@ -33,14 +36,6 @@ const lessons = [
     number: '5',
     subtopics: ['Special Case on the Product of Binomial and Trinomial'],
   },
-  {
-    number: '6',
-    subtopics: ['Factoring Perfect Square Trinomial', 'Factoring Difference of Two Squares'],
-  },
-  {
-    number: '7',
-    subtopics: ['Factoring Sum/Difference of Two Cubes', 'Factoring Quadratic Trinomial'],
-  },
 ];
 
 function App() {
@@ -52,11 +47,14 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          {[...Array(5).keys()].map((lesson) => (
+          <Route path="/about" element={<About />} /> {/* Add the About route */}
+          <Route path="/help" element={<Help />} /> {/* Add the Help route */}
+          <Route path="/profile" element={<Profile />} /> {/* Add the Profile route */}
+          {lessons.map((lesson) => (
             <Route
-              key={lesson}
-              path={`/lesson/${lesson + 1}`}
-              element={<Lesson lessonNumber={`${lesson + 1}`} />}
+              key={lesson.number}
+              path={`/lesson/${lesson.number}`}
+              element={<Lesson lessonNumber={lesson.number} />}
             />
           ))}
           <Route path="/lesson/6-7" element={<Lesson lessonNumber="6-7" />} />
@@ -67,10 +65,6 @@ function App() {
                 <Route
                   path={`/lesson/${lesson.number}/subtopic/${subIndex + 1}`}
                   element={<Subtopic lessonNumber={lesson.number} subtopic={subtopic} />}
-                />
-                <Route
-                  path={`/lesson/${lesson.number}/subtopic/${subtopic}/practice`}
-                  element={<PracticeQuestions />}
                 />
               </React.Fragment>
             ))
@@ -86,6 +80,11 @@ function App() {
                 key={`post-${lesson.number}`}
                 path={`/lesson/${lesson.number}/post-test`}
                 element={<PostTest lessonNumber={lesson.number} />}
+              />
+              <Route
+                key={`practice-${lesson.number}`}
+                path={`/lesson/${lesson.number}/practice`}
+                element={<PracticeQuestions lessonNumber={lesson.number} />}
               />
             </React.Fragment>
           ))}

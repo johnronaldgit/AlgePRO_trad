@@ -50,31 +50,6 @@ const postQuestions = {
       question: "Find the product of the expression: \\(-9x + \\frac{9}{16}\\).",
       options: ["a) 81x^2 + 10.125x + \\frac{81}{256}\\)", "b) 81x^2 - 10.125x + \\frac{81}{256}\\)", "c) 81x^2 + 5.0625x + \\frac{81}{256}\\)", "d) 81x^2 - 5.0625x + \\frac{81}{256}\\)"],
       correctAnswer: "b) 81x^2 - 10.125x + \\frac{81}{256}\\)"
-    },
-    {
-      question: "Determine if the expression \\(x^2 + 8x + 16\\) is a perfect square binomial.",
-      options: ["a) Yes, \\((x + 4)^2\\)", "b) Yes, \\((x + 4)(x + 4)\\)", "c) Both a and b are correct.", "d) No"],
-      correctAnswer: "c) Both a and b are correct."
-    },
-    {
-      question: "Determine if the expression \\(x^2 - 6x + 9\\) is a perfect square binomial.",
-      options: ["a) Yes, \\((x - 3)^2\\)", "b) Yes, \\((x - 3)(x + 3)\\)", "c) Both a and b are correct.", "d) No"],
-      correctAnswer: "a) Yes, \\((x - 3)^2\\)"
-    },
-    {
-      question: "Determine if the expression \\(x^2 - 10x + 100\\) is a perfect square binomial.",
-      options: ["a) Yes, \\((x - 10)^2\\)", "b) Yes, \\((x - 10)(x - 10)\\)", "c) Both a and b are correct.", "d) No"],
-      correctAnswer: "d) No"
-    },
-    {
-      question: "Determine if the expression \\(9x^2 - 30x + 25\\) is a perfect square binomial.",
-      options: ["a) Yes, \\((3x + 5)^2\\)", "b) Yes, \\((3x - 5)(3x - 5)\\)", "c) Both a and b are correct.", "d) No"],
-      correctAnswer: "b) Yes, \\((3x - 5)(3x - 5)\\)"
-    },
-    {
-      question: "Determine if the expression \\(\\frac{16}{25}x^2 - \\frac{24}{25}x + \\frac{9}{25}\\) is a perfect square binomial.",
-      options: ["a) Yes, \\(\\left(\\frac{2}{5}x + \\frac{3}{5}\\right)^2\\)", "b) Yes, \\(\\left(\\frac{2}{5}x + \\frac{3}{5}\\right)\\left(\\frac{2}{5}x + \\frac{3}{5}\\right)\\)", "c) Both a and b are correct.", "d) None of the choices is correct."],
-      correctAnswer: "d) None of the choices is correct."
     }
   ],  
   lesson2: [

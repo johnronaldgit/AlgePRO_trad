@@ -3,12 +3,14 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-import YouTube from 'react-youtube';
 import 'katex/dist/katex.min.css';
-import '../index.css'; // Ensure index.css is imported
 import { useNavigate, useParams } from 'react-router-dom';
 import { getDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../firebaseConfig';
+import { Worker, Viewer, SpecialZoomLevel } from '@react-pdf-viewer/core';
+import '@react-pdf-viewer/core/lib/styles/index.css';
+import '@react-pdf-viewer/default-layout/lib/styles/index.css';
+import algeprologo from '../assets/algeprologo.png'; // Ensure you have this path correct
 
 const contentFiles = {
   "1": {
@@ -27,40 +29,43 @@ const contentFiles = {
   "5": {
     "Special Case on the Product of Binomial and Trinomial": "/content/lesson5_special_case_product.md",
   },
-  "6": {
-    "Factoring Perfect Square Trinomial": "/content/lesson6_perfect_square_trinomial.md",
-    "Factoring Difference Of Two Squares": "/content/lesson6_difference_of_two_squares.md",
+};
+
+const pdfFiles = {
+  "1": {
+    "Special Products": "/pdfs/lesson1_special_products.pdf",
+    "Square Of Binomials": "/pdfs/lesson1_square_of_binomials.pdf",
   },
-  "7": {
-    "Factoring Sum/Difference Of Two Cubes": "/content/lesson7_sum_difference_of_two_cubes.md",
-    "Factoring Quadratic Trinomial": "/content/lesson7_quadratic_trinomial.md",
+  "2": {
+    "Square Of Trinomial": "/pdfs/lesson2_square_of_trinomial.pdf",
+  },
+  "3": {
+    "The Product of a Sum and Difference of the Same Two Terms": "/pdfs/lesson3_product_of_sum_and_difference.pdf",
+  },
+  "4": {
+    "Cube Of Binomials": "/pdfs/lesson4_cube_of_binomials.pdf",
+  },
+  "5": {
+    "Special Case on the Product of Binomial and Trinomial": "/pdfs/lesson5_special_case_product.pdf",
   },
 };
 
-const videoIds = {
+const audioFiles = {
   "1": {
-    "Special Products": "bFtjG45-Udk", // Replace with actual video IDs
-    "Square Of Binomials": "dQw4w9WgXcQ",
+    "Special Products": "/audio/lesson1_special_products.mp3",
+    "Square Of Binomials": "/audio/lesson1_square_of_binomials.mp3",
   },
   "2": {
-    "Square Of Trinomial": "f6yhfmW41wI&t=1s",
+    "Square Of Trinomial": "/audio/lesson2_square_of_trinomial.mp3",
   },
   "3": {
-    "The Product of a Sum and Difference of the Same Two Terms": "dQw4w9WgXcQ",
+    "The Product of a Sum and Difference of the Same Two Terms": "/audio/lesson3_product_of_sum_and_difference.mp3",
   },
   "4": {
-    "Cube Of Binomials": "6QQJoDshUt8&t=13s",
+    "Cube Of Binomials": "/audio/lesson4_cube_of_binomials.mp3",
   },
   "5": {
-    "Special Case on the Product of Binomial and Trinomial": "6xYW7VJ0w2s",
-  },
-  "6": {
-    "Factoring Perfect Square Trinomial": "f6yhfmW41wI",
-    "Factoring Difference Of Two Squares": "vvypGuPy6g2A",
-  },
-  "7": {
-    "Factoring Sum/Difference Of Two Cubes": "ADj8sGSjewg",
-    "Factoring Quadratic Trinomial": "-4jANGlJRSY",
+    "Special Case on the Product of Binomial and Trinomial": "/audio/lesson5_special_case_product.mp3",
   },
 };
 
@@ -68,7 +73,6 @@ function Subtopic({ lessonNumber, subtopic }) {
   const [selectedOption, setSelectedOption] = useState('');
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
   const { subtopicIndex } = useParams();
 
   const subtopics = Object.keys(contentFiles[lessonNumber]);
@@ -124,8 +128,21 @@ function Subtopic({ lessonNumber, subtopic }) {
       }
     };
 
-    if (selectedOption) {
+    if (selectedOption === 'Reading') {
       loadContent();
+    }
+  }, [selectedOption, lessonNumber, subtopic]);
+
+  useEffect(() => {
+    const updateAudioPlayer = () => {
+      const audioElement = document.getElementById('audio-player');
+      if (audioElement) {
+        audioElement.load();
+      }
+    };
+
+    if (selectedOption === 'Audio') {
+      updateAudioPlayer();
     }
   }, [selectedOption, lessonNumber, subtopic]);
 
@@ -133,8 +150,20 @@ function Subtopic({ lessonNumber, subtopic }) {
     setSelectedOption(event.target.value);
   };
 
-  const handlePracticeQuestionsClick = () => {
-    navigate(`/lesson/${lessonNumber}/subtopic/${subtopic}/practice`);
+  const getPdfUrl = (lessonNumber, subtopic) => {
+    const normalizedSubtopic = subtopic.toLowerCase().replace(/\s+/g, '');
+    const pdfKey = Object.keys(pdfFiles[lessonNumber]).find(key =>
+      key.toLowerCase().replace(/\s+/g, '') === normalizedSubtopic
+    );
+    return pdfKey ? pdfFiles[lessonNumber][pdfKey] : null;
+  };
+
+  const getAudioUrl = (lessonNumber, subtopic) => {
+    const normalizedSubtopic = subtopic.toLowerCase().replace(/\s+/g, '');
+    const audioKey = Object.keys(audioFiles[lessonNumber]).find(key =>
+      key.toLowerCase().replace(/\s+/g, '') === normalizedSubtopic
+    );
+    return audioKey ? audioFiles[lessonNumber][audioKey] : null;
   };
 
   return (
@@ -190,24 +219,29 @@ function Subtopic({ lessonNumber, subtopic }) {
               )}
               {selectedOption === 'Visual' && (
                 <div className="flex justify-center">
-                  <YouTube videoId={videoIds[lessonNumber][subtopic]} />
+                  {getPdfUrl(lessonNumber, subtopic) ? (
+                    <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.worker.min.js">
+                      <Viewer
+                        fileUrl={getPdfUrl(lessonNumber, subtopic)}
+                        defaultScale={SpecialZoomLevel.PageFit}
+                      />
+                    </Worker>
+                  ) : (
+                    <p>PDF not available for this subtopic.</p>
+                  )}
                 </div>
               )}
               {selectedOption === 'Audio' && (
-                <div>
-                  <p>Audio content for {subtopic}.</p>
+                <div className="flex flex-col items-center">
+                  <img src={algeprologo} alt="AlgePRO Logo" className="mb-4" />
+                  <audio controls id="audio-player" className="w-full max-w-lg">
+                    <source src={getAudioUrl(lessonNumber, subtopic)} type="audio/mp3" />
+                    Your browser does not support the audio element.
+                  </audio>
                 </div>
               )}
             </div>
           </section>
-          <footer className="flex justify-center p-4 bg-gray-100">
-            <button
-              onClick={handlePracticeQuestionsClick}
-              className="px-4 py-2 bg-yellow-500 text-black rounded-md hover:bg-yellow-600"
-            >
-              Practice Questions
-            </button>
-          </footer>
         </>
       )}
     </div>

@@ -1,4 +1,3 @@
-// src/components/FloatingButton.js
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import 'tailwindcss/tailwind.css';
@@ -12,11 +11,11 @@ const FloatingButton = () => {
     setShowWindow(!showWindow);
   };
 
-  // Check if the current path includes "pre-test" or "post-test"
-  const isTestPage = location.pathname.includes('pre-test') || location.pathname.includes('post-test');
+  // Check if the current path includes "pre-test", "post-test", "login", "register", or is exactly "/"
+  const isExcludedPage = location.pathname === '/' || location.pathname.includes('pre-test') || location.pathname.includes('post-test') || location.pathname.includes('login') || location.pathname.includes('register');
 
-  // Render the button and window only if not on test pages
-  if (isTestPage) {
+  // Render the button and window only if not on excluded pages
+  if (isExcludedPage) {
     return null;
   }
 

@@ -1,8 +1,8 @@
-// src/components/Layout.js
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { auth } from '../firebaseConfig';
-import { ChevronDownIcon, ChevronRightIcon, HomeIcon, BookOpenIcon, BoltIcon, DocumentTextIcon } from '@heroicons/react/20/solid';
+import { auth, db } from '../firebaseConfig';
+import { getDoc, doc } from 'firebase/firestore';
+import { ChevronDownIcon, ChevronRightIcon, HomeIcon, BookOpenIcon, BoltIcon, DocumentTextIcon, LockClosedIcon } from '@heroicons/react/20/solid';
 import 'tailwindcss/tailwind.css';
 import Navbar from './Navbar';
 import FloatingButton from './FloatingButton';
@@ -28,14 +28,6 @@ const lessons = [
     number: '5',
     subtopics: ['Special Case on the Product of Binomial and Trinomial'],
   },
-  {
-    number: '6',
-    subtopics: ['Factoring Perfect Square Trinomial', 'Factoring Difference of Two Squares'],
-  },
-  {
-    number: '7',
-    subtopics: ['Factoring Sum/Difference of Two Cubes', 'Factoring Quadratic Trinomial'],
-  },
 ];
 
 function Layout() {
@@ -44,11 +36,13 @@ function Layout() {
   const [openLesson, setOpenLesson] = useState(null);
   const [userEmail, setUserEmail] = useState(null);
   const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [unlockedLessons, setUnlockedLessons] = useState([1]); // Initially unlock the first lesson
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         setUserEmail(user.email);
+        fetchUnlockedLessons(user.email);
       } else {
         navigate('/login');
       }
@@ -56,6 +50,20 @@ function Layout() {
 
     return () => unsubscribe();
   }, [navigate]);
+
+  const fetchUnlockedLessons = async (email) => {
+    try {
+      const userDocRef = doc(db, 'users', email);
+      const userDocSnap = await getDoc(userDocRef);
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        const unlocked = userData.unlockedLessons || [1];
+        setUnlockedLessons(unlocked);
+      }
+    } catch (error) {
+      console.error('Error fetching unlocked lessons:', error);
+    }
+  };
 
   const handleLogout = () => {
     auth.signOut().then(() => {
@@ -74,6 +82,8 @@ function Layout() {
   const getLessonPath = (lessonNumber) => lessonNumber.includes('&') ? lessonNumber.replace(' & ', '-') : lessonNumber;
 
   const toggleSidebar = () => setSidebarVisible(!sidebarVisible);
+
+  const isLessonUnlocked = (lessonNumber) => unlockedLessons.includes(parseInt(lessonNumber));
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -95,16 +105,21 @@ function Layout() {
                     <button
                       onClick={() => toggleLesson(lesson.number)}
                       className={`flex items-center w-full text-left hover:text-white ${openLesson === lesson.number || isLessonActive(lesson.number) ? 'bg-[#D7A700] rounded-lg opacity-75 p-2 text-black' : ''}`}
+                      disabled={!isLessonUnlocked(lesson.number)}
                     >
                       <BookOpenIcon className="w-5 h-5 mr-2 flex-shrink-0" />
-                      <span className="text-lg flex-1">Lesson {lesson.number}</span>
-                      {openLesson === lesson.number ? (
-                        <ChevronDownIcon className="w-5 h-5 ml-2 flex-shrink-0" />
+                      <span className={`text-lg flex-1 ${!isLessonUnlocked(lesson.number) ? 'text-gray-500' : ''}`}>Lesson {lesson.number}</span>
+                      {isLessonUnlocked(lesson.number) ? (
+                        openLesson === lesson.number ? (
+                          <ChevronDownIcon className="w-5 h-5 ml-2 flex-shrink-0" />
+                        ) : (
+                          <ChevronRightIcon className="w-5 h-5 ml-2 flex-shrink-0" />
+                        )
                       ) : (
-                        <ChevronRightIcon className="w-5 h-5 ml-2 flex-shrink-0" />
+                        <LockClosedIcon className="w-5 h-5 ml-2 flex-shrink-0 text-gray-500" />
                       )}
                     </button>
-                    {openLesson === lesson.number && (
+                    {openLesson === lesson.number && isLessonUnlocked(lesson.number) && (
                       <ul className="ml-4 mt-2">
                         <li className={`mb-2 ${isActive(`/lesson/${getLessonPath(lesson.number)}/pre-test`) ? 'bg-[#D7A700] rounded-lg opacity-75 p-2 text-black' : ''}`}>
                           <Link to={`/lesson/${getLessonPath(lesson.number)}/pre-test`} className={`flex items-center hover:text-white ${isActive(`/lesson/${getLessonPath(lesson.number)}/pre-test`) ? 'text-black' : ''}`}>
