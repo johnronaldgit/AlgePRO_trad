@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import MathJax from 'react-mathjax2';
 import { db, auth } from '../firebaseConfig';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import postQuestions from '../postQuestions'; // Import post-test questions from the separate file
 
 function PostTest({ lessonNumber }) {
@@ -22,6 +22,7 @@ function PostTest({ lessonNumber }) {
   const [saving, setSaving] = useState(false); // Loading state for saving results
 
   const navigate = useNavigate();
+  const { setLoading, fetchUnlockedLessons } = useOutletContext(); // Get setLoading and fetchUnlockedLessons from context
 
   useEffect(() => {
     const fetchData = async () => {
@@ -154,24 +155,27 @@ function PostTest({ lessonNumber }) {
           didPass: passed // Save pass/fail status
         }, { merge: true });
 
-        // Fetch current unlocked lessons and update
-        const userDocRef = doc(db, 'users', userEmail);
-        const userDocSnap = await getDoc(userDocRef);
-        if (userDocSnap.exists()) {
-          const userData = userDocSnap.data();
-          const currentUnlockedLessons = userData.unlockedLessons || [1];
-          if (passed) {
-            const nextLesson = lessonNumber + 1;
-            if (!currentUnlockedLessons.includes(nextLesson)) {
-              currentUnlockedLessons.push(nextLesson);
+        console.log('Post-test score saved successfully');
+
+        // Unlock the next lesson if passed
+        if (passed) {
+          const userDocRef = doc(db, 'users', userEmail);
+          const userDocSnap = await getDoc(userDocRef);
+          if (userDocSnap.exists()) {
+            const userData = userDocSnap.data();
+            const unlockedLessons = userData.unlockedLessons || [1];
+            const nextLessonNumber = parseInt(lessonNumber) + 1;
+            if (!unlockedLessons.includes(nextLessonNumber)) {
+              unlockedLessons.push(nextLessonNumber);
+              await setDoc(userDocRef, { unlockedLessons }, { merge: true });
             }
           }
-          await updateDoc(userDocRef, {
-            unlockedLessons: currentUnlockedLessons
-          });
         }
 
-        console.log('Post-test score saved successfully');
+        // Trigger loading state and fetch unlocked lessons after saving score
+        setLoading(true);
+        await fetchUnlockedLessons(userEmail);
+        setLoading(false);
       } catch (error) {
         console.error('Error saving post-test score:', error);
       } finally {

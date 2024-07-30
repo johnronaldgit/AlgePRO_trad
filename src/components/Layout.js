@@ -37,6 +37,7 @@ function Layout() {
   const [userEmail, setUserEmail] = useState(null);
   const [sidebarVisible, setSidebarVisible] = useState(true);
   const [unlockedLessons, setUnlockedLessons] = useState([1]); // Initially unlock the first lesson
+  const [loading, setLoading] = useState(false); // Add a loading state
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -83,8 +84,6 @@ function Layout() {
 
   const toggleSidebar = () => setSidebarVisible(!sidebarVisible);
 
-  const isLessonUnlocked = (lessonNumber) => unlockedLessons.includes(parseInt(lessonNumber));
-
   return (
     <div className="flex h-screen overflow-hidden">
       <Navbar toggleSidebar={toggleSidebar} />
@@ -103,23 +102,22 @@ function Layout() {
                 {lessons.map((lesson, index) => (
                   <li key={index} className="mb-4">
                     <button
-                      onClick={() => toggleLesson(lesson.number)}
+                      onClick={() => unlockedLessons.includes(parseInt(lesson.number)) && toggleLesson(lesson.number)}
                       className={`flex items-center w-full text-left hover:text-white ${openLesson === lesson.number || isLessonActive(lesson.number) ? 'bg-[#D7A700] rounded-lg opacity-75 p-2 text-black' : ''}`}
-                      disabled={!isLessonUnlocked(lesson.number)}
                     >
                       <BookOpenIcon className="w-5 h-5 mr-2 flex-shrink-0" />
-                      <span className={`text-lg flex-1 ${!isLessonUnlocked(lesson.number) ? 'text-gray-500' : ''}`}>Lesson {lesson.number}</span>
-                      {isLessonUnlocked(lesson.number) ? (
-                        openLesson === lesson.number ? (
-                          <ChevronDownIcon className="w-5 h-5 ml-2 flex-shrink-0" />
-                        ) : (
-                          <ChevronRightIcon className="w-5 h-5 ml-2 flex-shrink-0" />
-                        )
+                      <span className="text-lg flex-1">Lesson {lesson.number}</span>
+                      {openLesson === lesson.number ? (
+                        <ChevronDownIcon className="w-5 h-5 ml-2 flex-shrink-0" />
                       ) : (
-                        <LockClosedIcon className="w-5 h-5 ml-2 flex-shrink-0 text-gray-500" />
+                        unlockedLessons.includes(parseInt(lesson.number)) ? (
+                          <ChevronRightIcon className="w-5 h-5 ml-2 flex-shrink-0" />
+                        ) : (
+                          <LockClosedIcon className="w-5 h-5 ml-2 flex-shrink-0" />
+                        )
                       )}
                     </button>
-                    {openLesson === lesson.number && isLessonUnlocked(lesson.number) && (
+                    {openLesson === lesson.number && unlockedLessons.includes(parseInt(lesson.number)) && (
                       <ul className="ml-4 mt-2">
                         <li className={`mb-2 ${isActive(`/lesson/${getLessonPath(lesson.number)}/pre-test`) ? 'bg-[#D7A700] rounded-lg opacity-75 p-2 text-black' : ''}`}>
                           <Link to={`/lesson/${getLessonPath(lesson.number)}/pre-test`} className={`flex items-center hover:text-white ${isActive(`/lesson/${getLessonPath(lesson.number)}/pre-test`) ? 'text-black' : ''}`}>
@@ -165,7 +163,27 @@ function Layout() {
 
         {/* Main content */}
         <div className={`flex-1 p-6 overflow-y-auto transition-all duration-300 ${sidebarVisible ? 'ml-64' : 'ml-0'}`}>
-          <Outlet />
+          {loading && (
+            <div className="flex justify-center items-center h-full">
+              <div className="loader"></div>
+              <style>{`
+                .loader {
+                  border: 16px solid #f3f3f3;
+                  border-top: 16px solid #3498db;
+                  border-radius: 50%;
+                  width: 120px;
+                  height: 120px;
+                  animation: spin 2s linear infinite;
+                }
+
+                @keyframes spin {
+                  0% { transform: rotate(0deg); }
+                  100% { transform: rotate(360deg); }
+                }
+              `}</style>
+            </div>
+          )}
+          {!loading && <Outlet context={{ setLoading, fetchUnlockedLessons }} />}
         </div>
       </div>
       <FloatingButton />

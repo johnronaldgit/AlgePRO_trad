@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import MathJax from 'react-mathjax2';
 import { db, auth } from '../firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 import questions from '../practice_questions.json'; // Import questions from the separate file
+import FloatingButton from './FloatingButton'; // Import FloatingButton
 
 function PracticeQuestions({ lessonNumber }) {
   const [currentQuestion, setCurrentQuestion] = useState(null);
@@ -15,6 +16,7 @@ function PracticeQuestions({ lessonNumber }) {
   const [knowledgeLevel, setKnowledgeLevel] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [remainingQuestions, setRemainingQuestions] = useState([]);
+  const [floatingButtonDisabled, setFloatingButtonDisabled] = useState(true); // State to manage FloatingButton
 
   const fetchKnowledgeLevel = useCallback(async () => {
     const user = auth.currentUser;
@@ -82,6 +84,9 @@ function PracticeQuestions({ lessonNumber }) {
       { question: currentQuestion, answer: answers[currentQuestion.question], isCorrect },
     ]);
     setIsSubmitted(true);
+    if (!isCorrect) {
+      setFloatingButtonDisabled(false); // Enable FloatingButton if the answer is incorrect
+    }
     if (isCorrect) {
       setCorrectCount((prevCount) => prevCount + 1);
     }
@@ -93,6 +98,7 @@ function PracticeQuestions({ lessonNumber }) {
     setCurrentQuestion(newRemainingQuestions[0]);
     setIsSubmitted(false);
     setIsSubmitEnabled(false);
+    setFloatingButtonDisabled(true); // Disable FloatingButton when moving to the next question
 
     if (newRemainingQuestions.length === 0) {
       setIsFinished(true);
@@ -142,6 +148,24 @@ function PracticeQuestions({ lessonNumber }) {
               <MathJax.Text text={question.correctAnswer} />
             </div>
           )}
+          <div className="mt-6 flex justify-end items-center">
+            {isSubmitted && !isCorrect && (
+              <button className="mr-4 p-2 bg-yellow-500 text-white rounded-md">
+                Ask for Help?
+              </button>
+            )}
+            <button
+              onClick={isSubmitted ? handleNextQuestion : handleSubmitAnswer}
+              className={`px-4 py-2 rounded-md ${
+                isSubmitEnabled || isSubmitted
+                  ? 'bg-blue-500 text-white hover:bg-blue-600'
+                  : 'bg-red-500 text-white cursor-not-allowed'
+              }`}
+              disabled={!isSubmitEnabled && !isSubmitted}
+            >
+              {isSubmitted ? 'Next' : 'Submit'}
+            </button>
+          </div>
         </div>
       </MathJax.Context>
     );
@@ -213,25 +237,13 @@ function PracticeQuestions({ lessonNumber }) {
           {!isFinished ? (
             <>
               {renderQuestion()}
-              <div className="mt-6 flex justify-end">
-                <button
-                  onClick={isSubmitted ? handleNextQuestion : handleSubmitAnswer}
-                  className={`px-4 py-2 rounded-md ${
-                    isSubmitEnabled || isSubmitted
-                      ? 'bg-blue-500 text-white hover:bg-blue-600'
-                      : 'bg-red-500 text-white cursor-not-allowed'
-                  }`}
-                  disabled={!isSubmitEnabled && !isSubmitted}
-                >
-                  {isSubmitted ? 'Next' : 'Submit'}
-                </button>
-              </div>
             </>
           ) : (
             renderResults()
           )}
         </div>
       </section>
+      <FloatingButton disabled={floatingButtonDisabled} />
     </div>
   );
 }
