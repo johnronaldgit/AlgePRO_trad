@@ -31,8 +31,8 @@ export default async (req, res) => {
           "role": "user",
           "content": [
             {
-              "text": "Expand and simplify \\\\((\\\\frac{1}{2}a + \\\\frac{3}{4})^3\\\\)",
-              "type": "text"
+              "type": "text",
+              "text": "Expand and simplify \\((\\frac{1}{2}a + \\frac{3}{4})^3\\)"
             }
           ]
         },
@@ -40,8 +40,8 @@ export default async (req, res) => {
           "role": "assistant",
           "content": [
             {
-              "text": "Sure! Let's start by expanding \\\\((\\\\frac{1}{2}a + \\\\frac{3}{4})^3\\\\). Can you tell me what the first step is to expand \\\\((\\\\frac{1}{2}a + \\\\frac{3}{4})^3\\\\)?",
-              "type": "text"
+              "type": "text",
+              "text": "Sure! Let's start by expanding \\((\\frac{1}{2}a + \\frac{3}{4})^3\\). Can you tell me what the first step is to expand \\((\\frac{1}{2}a + \\frac{3}{4})^3\\)?"
             }
           ]
         },
@@ -58,8 +58,8 @@ export default async (req, res) => {
           "role": "assistant",
           "content": [
             {
-              "text": "That's okay! The first step is to use the binomial expansion formula, which is \\\\( (a + b)^3 = a^3 + 3a^2b + 3ab^2 + b^3 \\\\). Now, can you tell me what we should do next?",
-              "type": "text"
+              "type": "text",
+              "text": "That's okay! The first step is to use the binomial expansion formula, which is \\( (a + b)^3 = a^3 + 3a^2b + 3ab^2 + b^3 \\). Now, can you tell me what we should do next?"
             }
           ]
         },
@@ -76,8 +76,8 @@ export default async (req, res) => {
           "role": "assistant",
           "content": [
             {
-              "text": "Exactly! Now, let's substitute \\\\( \\\\frac{1}{2}a \\\\) for \\\\( a \\\\) and \\\\( \\\\frac{3}{4} \\\\) for \\\\( b \\\\) in the binomial expansion formula. Can you give me the expression after substituting these values?",
-              "type": "text"
+              "type": "text",
+              "text": "Exactly! Now, let's substitute \\( \\frac{1}{2}a \\) for \\( a \\) and \\( \\frac{3}{4} \\) for \\( b \\) in the binomial expansion formula. Can you give me the expression after substituting these values?"
             }
           ]
         },
@@ -112,8 +112,8 @@ export default async (req, res) => {
           "role": "assistant",
           "content": [
             {
-              "text": "Good job! But let's simplify the last two terms, \\\\(26/32a + 27/64\\\\), even further. Can you simplify these two fractions and give me the final expression for \\\\((\\\\frac{1}{2}a + \\\\frac{3}{4})^3\\\\)?",
-              "type": "text"
+              "type": "text",
+              "text": "Good job! But let's simplify the last two terms, \\(26/32a + 27/64\\), even further. Can you simplify these two fractions and give me the final expression for \\((\\frac{1}{2}a + \\frac{3}{4})^3\\)?"
             }
           ]
         },
@@ -130,8 +130,8 @@ export default async (req, res) => {
           "role": "assistant",
           "content": [
             {
-              "text": "Excellent work! You've successfully expanded and simplified \\\\((\\\\frac{1}{2}a + \\\\frac{3}{4})^3\\\\). The final expression is \\\\(\\\\frac{1}{8}a^3 + \\\\frac{9}{16}a^2 + \\\\frac{27}{32}a + \\\\frac{27}{64}\\\\). Keep up the good work!",
-              "type": "text"
+              "type": "text",
+              "text": "Excellent work! You've successfully expanded and simplified \\((\\frac{1}{2}a + \\frac{3}{4})^3\\). The final expression is \\(\\frac{1}{8}a^3 + \\frac{9}{16}a^2 + \\frac{27}{32}a + \\frac{27}{64}\\). Keep up the good work!"
             }
           ]
         },
@@ -247,8 +247,8 @@ export default async (req, res) => {
           "role": "assistant",
           "content": [
             {
-              "text": "Absolutely right! You've successfully expanded and simplified \\\\((2x + 3)^3\\\\) correctly. The final expression is \\\\(8x^3 + 36x^2 + 54x + 27\\\\). Well done!",
-              "type": "text"
+              "type": "text",
+              "text": "Absolutely right! You've successfully expanded and simplified \\((2x + 3)^3\\) correctly. The final expression is \\(8x^3 + 36x^2 + 54x + 27\\). Well done!"
             }
           ]
         },
@@ -256,8 +256,8 @@ export default async (req, res) => {
           "role": "user",
           "content": [
             {
-              "text": "Simplify the expression \\\\((x^3 + 8)(x^3 - 8)\\\\)",
-              "type": "text"
+              "type": "text",
+              "text": "Simplify the expression \\\\((x^3 + 8)(x^3 - 8)\\\\)"
             }
           ]
         },
@@ -265,8 +265,8 @@ export default async (req, res) => {
           "role": "assistant",
           "content": [
             {
-              "text": "That's a great starting point. Now, can you expand the given expression \\\\((x^3 + 8)(x^3 - 8)\\\\) using the distributive property of multiplication and then simplify it?",
-              "type": "text"
+              "type": "text",
+              "text": "That's a great starting point. Now, can you expand the given expression \\((x^3 + 8)(x^3 - 8)\\) using the distributive property of multiplication and then simplify it?"
             }
           ]
         },
@@ -283,8 +283,8 @@ export default async (req, res) => {
           "role": "assistant",
           "content": [
             {
-              "text": "The distributive property states that when we multiply a sum by a number, we can multiply each term in the sum by that number and then add the results. So, let's apply the distributive property and expand the given expression \\\\((x^3 + 8)(x^3 - 8)\\\\). Can you tell me what the expanded expression looks like?",
-              "type": "text"
+              "type": "text",
+              "text": "The distributive property states that when we multiply a sum by a number, we can multiply each term in the sum by that number and then add the results. So, let's apply the distributive property and expand the given expression \\((x^3 + 8)(x^3 - 8)\\). Can you tell me what the expanded expression looks like?"
             }
           ]
         },
@@ -301,8 +301,8 @@ export default async (req, res) => {
           "role": "assistant",
           "content": [
             {
-              "text": "That's correct! Now, as you can see, the terms \\\\(-8x^3\\\\) and \\\\(+8x^3\\\\) cancel each other out. So, what does the simplified expression \\\\((x^3 + 8)(x^3 - 8)\\\\) look like now?",
-              "type": "text"
+              "type": "text",
+              "text": "That's correct! Now, as you can see, the terms \\(-8x^3\\) and \\(+8x^3\\) cancel each other out. So, what does the simplified expression \\((x^3 + 8)(x^3 - 8)\\) look like now?"
             }
           ]
         },
@@ -319,8 +319,8 @@ export default async (req, res) => {
           "role": "assistant",
           "content": [
             {
-              "text": "You're correct! The simplified expression for \\\\((x^3 + 8)(x^3 - 8)\\\\) is \\\\(x^6 - 64\\\\). Well done!",
-              "type": "text"
+              "type": "text",
+              "text": "That's correct! The simplified expression for \\((x^3 + 8)(x^3 - 8)\\) is \\(x^6 - 64\\). Keep up the good work!"
             }
           ]
         },
