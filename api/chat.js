@@ -2,6 +2,8 @@ import OpenAI from 'openai';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
+  organization:'org-mjQadZF66IWCKvtib7J0eoeM',
+  project:'proj_fh4IzlLEvIx4Q3I0T0s9gyXh',
 });
 
 export default async (req, res) => {
@@ -14,7 +16,7 @@ export default async (req, res) => {
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4-turbo",
+      model: "ft:gpt-3.5-turbo-1106:personal:algepro:9rhW1W0j",
       messages: [
         {
           "role": "system",
