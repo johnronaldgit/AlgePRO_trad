@@ -90,7 +90,7 @@ function Dashboard() {
     if (latestLessonNumber === undefined || latestLessonNumber === 'Finished') {
       alert('All lessons are completed!');
     } else {
-      navigate(`/lesson/${latestLessonNumber}/subtopic/1`); // Navigate to the first subtopic of the latest unlocked lesson
+      navigate(`/lesson/${latestLessonNumber}/pre-test`); // Navigate to the pre-test of the latest unlocked lesson
     }
   };
 
@@ -120,7 +120,7 @@ function Dashboard() {
                 className="px-4 py-2 sm:px-6 sm:py-3 bg-yellow-400 text-black font-semibold rounded-lg shadow-lg hover:bg-yellow-300 w-full sm:w-auto"
                 onClick={handleStartLearning}
               >
-                Start Learning
+                {currentTopic === 'Finished' ? 'All lessons completed' : `Go to ${currentTopic}`}
               </button>
               <button
                 className="px-4 py-2 sm:px-6 sm:py-3 bg-transparent border border-yellow-400 text-yellow-400 font-semibold rounded-lg shadow-lg hover:bg-yellow-300 hover:text-black w-full sm:w-auto"

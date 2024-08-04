@@ -33,17 +33,17 @@ function PostTest({ lessonNumber }) {
         const postTestDocRef = doc(db, 'users', userEmail, 'scores', lesson);
 
         const postTestDoc = await getDoc(postTestDocRef);
-        if (postTestDoc.exists() && postTestDoc.data().PostTestScores) {
+        if (postTestDoc.exists() && postTestDoc.data().post_test_score !== undefined) {
           const data = postTestDoc.data();
           setHasCompletedPostTest(true);
-          setCompletedTestData(data.PostTestScores);
+          setCompletedTestData(data.post_test_score);
           setDidPass(data.didPass);
           if (!data.didPass) {
             setIsFinished(true); // Set isFinished to true if the user failed the test
           }
           // Set correct and incorrect counts from fetched data
-          setCorrectCount(data.PostTestScores.correctCount);
-          setIncorrectCount(data.PostTestScores.incorrectCount);
+          setCorrectCount(data.post_test_score);
+          setIncorrectCount(5 - data.post_test_score);
         } else {
           setHasCompletedPostTest(false);
           setCompletedTestData(null);
@@ -67,7 +67,7 @@ function PostTest({ lessonNumber }) {
     fetchData();
   }, [lessonNumber]);
 
-  const lessonQuestions = postQuestions[`lesson${lessonNumber}`];
+  const lessonQuestions = postQuestions[`lesson${lessonNumber}`].slice(0, 5); // Ensure only 5 questions are used
 
   const handleAnswerSelect = (option) => {
     const newAnswers = [...answers];
@@ -94,18 +94,10 @@ function PostTest({ lessonNumber }) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
       // Check if user passed or failed the test
-      const passed = correctCount >= Math.ceil(lessonQuestions.length * 0.7);
+      const passed = correctCount >= 4;
       setDidPass(passed);
-      saveScore(passed);
+      saveScore(passed, correctCount);
       setIsFinished(true);
-    }
-  };
-
-  const handlePreviousQuestion = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-      setIsSubmitted(submittedAnswers[currentQuestionIndex - 1] !== undefined);
-      setIsSubmitEnabled(answers[currentQuestionIndex - 1] !== undefined);
     }
   };
 
@@ -123,35 +115,17 @@ function PostTest({ lessonNumber }) {
     setIncorrectCount(incorrect);
   };
 
-  const determineKnowledgeLevel = (correctCount) => {
-    if (correctCount >= 0 && correctCount <= 3) {
-      return 'Beginner';
-    } else if (correctCount >= 4 && correctCount <= 7) {
-      return 'Intermediate';
-    } else if (correctCount >= 8 && correctCount <= 10) {
-      return 'Advanced';
-    }
-  };
-
-  const saveScore = async (passed) => {
+  const saveScore = async (passed, score) => {
     const user = auth.currentUser;
     if (user) {
       const userEmail = user.email;
       const lesson = `lesson${lessonNumber}`;
       const scoresRef = doc(db, 'users', userEmail, 'scores', lesson);
 
-      // Determine knowledge level
-      const knowledgeLevel = determineKnowledgeLevel(correctCount);
-
       try {
         setSaving(true);
         await setDoc(scoresRef, {
-          PostTestScores: {
-            correctCount,
-            incorrectCount,
-            submittedAnswers
-          },
-          knowledgeLevel,
+          post_test_score: score,
           didPass: passed // Save pass/fail status
         }, { merge: true });
 
@@ -181,11 +155,7 @@ function PostTest({ lessonNumber }) {
       } finally {
         setSaving(false);
         setHasCompletedPostTest(true);
-        setCompletedTestData({
-          correctCount,
-          incorrectCount,
-          submittedAnswers
-        });
+        setCompletedTestData(score);
       }
     }
   };
@@ -226,8 +196,7 @@ function PostTest({ lessonNumber }) {
           </ul>
           {isSubmitted && (
             <div className={`mt-4 p-4 rounded-md ${isCorrect ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>
-              {isCorrect ? 'Correct!' : `Incorrect! The correct answer is `}
-              <MathJax.Text text={question.correctAnswer} />
+              {isCorrect ? 'Correct!' : 'Incorrect!'}
             </div>
           )}
         </div>
@@ -235,37 +204,12 @@ function PostTest({ lessonNumber }) {
     );
   };
 
-  const renderResults = (resultsData) => {
-    if (!resultsData) return null;
-
-    const { correctCount, incorrectCount, submittedAnswers } = resultsData;
-
+  const renderResults = (score) => {
     return (
-      <MathJax.Context input='tex'>
-        <div>
-          <h2 className="text-2xl font-bold">Test Completed</h2>
-          <p className="mt-4">Total Score: {correctCount} out of 10</p>
-          <p className="mt-2">Correct Answers: {correctCount}</p>
-          <p className="mt-2">Incorrect Answers: {incorrectCount}</p>
-          <div className="mt-6">
-            <h3 className="text-xl font-bold">Review Your Answers</h3>
-            <ul className="mt-4">
-              {submittedAnswers.map((answer, index) => (
-                <li key={index} className="mb-4">
-                  <div className="flex items-center">
-                    <span className="mr-2">{index + 1}.</span>
-                    <MathJax.Text text={lessonQuestions[index].question} />
-                  </div>
-                  <div className={`mt-2 p-2 rounded-md ${answer.isCorrect ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>
-                    Your answer: <MathJax.Text text={answer.answer} /> - {answer.isCorrect ? 'Correct' : `Incorrect, the correct answer is `}
-                    <MathJax.Text text={lessonQuestions[index].correctAnswer} />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </MathJax.Context>
+      <div>
+        <h2 className="text-2xl font-bold">Test Completed</h2>
+        <p className="mt-4">Total Score: {score} out of 5</p>
+      </div>
     );
   };
 
@@ -282,8 +226,8 @@ function PostTest({ lessonNumber }) {
       <div className="bg-red-200 p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold">Post-test Not Passed</h2>
         <p className="mt-4">You did not pass the post-test for Lesson {lessonNumber}.</p>
-        <p className="mt-2">Total Score: {correctCount} out of 10</p>
-        <p className="mt-2">You need to score at least 7 out of 10 to pass.</p>
+        <p className="mt-2">Total Score: {correctCount} out of 5</p>
+        <p className="mt-2">You need to score at least 4 out of 5 to pass.</p>
         <div className="mt-6 flex justify-between">
           <button
             onClick={() => navigate(`/lesson/${lessonNumber}/subtopic/1`)}
@@ -311,15 +255,23 @@ function PostTest({ lessonNumber }) {
   if (hasCompletedPostTest && didPass) {
     return (
       <div className="bg-blue-200 p-6 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold">Post-test Already Completed</h2>
-        <p className="mt-4">You have already completed the post-test for Lesson {lessonNumber}.</p>
         {renderResults(completedTestData)}
-        <button
-          onClick={() => navigate('/dashboard')}
-          className="mt-6 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-        >
-          Go to Dashboard
-        </button>
+        <div className="mt-6 flex justify-between">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          >
+            Go to Dashboard
+          </button>
+          {parseInt(lessonNumber) < 5 && (
+            <button
+              onClick={() => navigate(`/lesson/${parseInt(lessonNumber) + 1}/pre-test`)}
+              className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+            >
+              Next Lesson
+            </button>
+          )}
+        </div>
       </div>
     );
   }
@@ -361,14 +313,7 @@ function PostTest({ lessonNumber }) {
           {!isFinished ? (
             <>
               {renderQuestion()}
-              <div className="mt-6 flex justify-between">
-                <button
-                  onClick={handlePreviousQuestion}
-                  className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
-                  disabled={currentQuestionIndex === 0}
-                >
-                  Previous
-                </button>
+              <div className="mt-6 flex justify-end">
                 <button
                   onClick={isSubmitted ? handleNextQuestion : handleSubmitAnswer}
                   className={`px-4 py-2 rounded-md ${isSubmitEnabled ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-red-500 text-white cursor-not-allowed'}`}
@@ -379,7 +324,7 @@ function PostTest({ lessonNumber }) {
               </div>
             </>
           ) : (
-            renderResults({ correctCount, incorrectCount, submittedAnswers })
+            renderResults(correctCount)
           )}
         </div>
       </section>

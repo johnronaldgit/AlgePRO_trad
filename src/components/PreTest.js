@@ -8,15 +8,12 @@ import questions from '../questions'; // Import questions from the separate file
 function PreTest({ lessonNumber }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState([]);
-  const [submittedAnswers, setSubmittedAnswers] = useState([]);
   const [isFinished, setIsFinished] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
-  const [incorrectCount, setIncorrectCount] = useState(0);
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(true);
   const [hasCompletedPreTest, setHasCompletedPreTest] = useState(false);
-  const [completedTestData, setCompletedTestData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
@@ -30,12 +27,10 @@ function PreTest({ lessonNumber }) {
         const preTestDocRef = doc(db, 'users', userEmail, 'scores', lesson);
 
         const preTestDoc = await getDoc(preTestDocRef);
-        if (preTestDoc.exists() && preTestDoc.data().PreTestScores) {
+        if (preTestDoc.exists() && preTestDoc.data().pre_test_scores !== undefined) {
           setHasCompletedPreTest(true);
-          setCompletedTestData(preTestDoc.data().PreTestScores);
         } else {
           setHasCompletedPreTest(false);
-          setCompletedTestData(null);
         }
       }
       setIsLoading(false);
@@ -46,17 +41,15 @@ function PreTest({ lessonNumber }) {
     // Reset state when lessonNumber changes
     setCurrentQuestionIndex(0);
     setAnswers([]);
-    setSubmittedAnswers([]);
     setIsFinished(false);
     setCorrectCount(0);
-    setIncorrectCount(0);
     setIsSubmitEnabled(false);
     setIsSubmitted(false);
     setShowConfirmation(true);
     setIsLoading(true);
   }, [lessonNumber]);
 
-  const lessonQuestions = questions[`lesson${lessonNumber}`];
+  const lessonQuestions = questions[`lesson${lessonNumber}`].slice(0, 5); // Change to 5 questions
 
   const handleAnswerSelect = (option) => {
     const newAnswers = [...answers];
@@ -66,14 +59,11 @@ function PreTest({ lessonNumber }) {
   };
 
   const handleSubmitAnswer = () => {
-    const newSubmittedAnswers = [...submittedAnswers];
-    newSubmittedAnswers[currentQuestionIndex] = {
-      answer: answers[currentQuestionIndex],
-      isCorrect: answers[currentQuestionIndex]?.trim() === lessonQuestions[currentQuestionIndex].correctAnswer.trim()
-    };
-    setSubmittedAnswers(newSubmittedAnswers);
+    const isCorrect = answers[currentQuestionIndex]?.trim() === lessonQuestions[currentQuestionIndex].correctAnswer.trim();
     setIsSubmitted(true);
-    calculateResults(newSubmittedAnswers);
+    if (isCorrect) {
+      setCorrectCount(correctCount + 1);
+    }
   };
 
   const handleNextQuestion = () => {
@@ -87,38 +77,6 @@ function PreTest({ lessonNumber }) {
     }
   };
 
-  const handlePreviousQuestion = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-      setIsSubmitted(submittedAnswers[currentQuestionIndex - 1] !== undefined);
-      setIsSubmitEnabled(answers[currentQuestionIndex - 1] !== undefined);
-    }
-  };
-
-  const calculateResults = (submittedAnswers) => {
-    let correct = 0;
-    let incorrect = 0;
-    submittedAnswers.forEach((answer) => {
-      if (answer.isCorrect) {
-        correct++;
-      } else {
-        incorrect++;
-      }
-    });
-    setCorrectCount(correct);
-    setIncorrectCount(incorrect);
-  };
-
-  const determineKnowledgeLevel = (correctCount) => {
-    if (correctCount >= 0 && correctCount <= 3) {
-      return 'Beginner';
-    } else if (correctCount >= 4 && correctCount <= 7) {
-      return 'Intermediate';
-    } else if (correctCount >= 8 && correctCount <= 10) {
-      return 'Advanced';
-    }
-  };
-
   const saveScore = async () => {
     const user = auth.currentUser;
     if (user) {
@@ -126,17 +84,9 @@ function PreTest({ lessonNumber }) {
       const lesson = `lesson${lessonNumber}`;
       const scoresRef = doc(db, 'users', userEmail, 'scores', lesson);
 
-      // Determine knowledge level
-      const knowledgeLevel = determineKnowledgeLevel(correctCount);
-
       try {
         await setDoc(scoresRef, {
-          PreTestScores: {
-            correctCount,
-            incorrectCount,
-            submittedAnswers
-          },
-          knowledgeLevel
+          pre_test_scores: correctCount
         }, { merge: true });
 
         console.log('Pre-test score saved successfully');
@@ -148,7 +98,6 @@ function PreTest({ lessonNumber }) {
 
   const renderQuestion = () => {
     const question = lessonQuestions[currentQuestionIndex];
-    const isCorrect = isSubmitted && answers[currentQuestionIndex]?.trim() === question.correctAnswer.trim();
 
     return (
       <MathJax.Context input='tex'>
@@ -172,45 +121,10 @@ function PreTest({ lessonNumber }) {
             ))}
           </ul>
           {isSubmitted && (
-            <div className={`mt-4 p-4 rounded-md ${isCorrect ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>
-              {isCorrect ? 'Correct!' : `Incorrect! The correct answer is `}
-              <MathJax.Text text={question.correctAnswer} />
+            <div className={`mt-4 p-4 rounded-md ${answers[currentQuestionIndex]?.trim() === question.correctAnswer.trim() ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>
+              {answers[currentQuestionIndex]?.trim() === question.correctAnswer.trim() ? 'Correct!' : 'Incorrect!'}
             </div>
           )}
-        </div>
-      </MathJax.Context>
-    );
-  };
-
-  const renderResults = (resultsData) => {
-    if (!resultsData) return null;
-
-    const { correctCount, incorrectCount, submittedAnswers } = resultsData;
-
-    return (
-      <MathJax.Context input='tex'>
-        <div>
-          <h2 className="text-2xl font-bold">Test Completed</h2>
-          <p className="mt-4">Total Score: {correctCount} out of 10</p>
-          <p className="mt-2">Correct Answers: {correctCount}</p>
-          <p className="mt-2">Incorrect Answers: {incorrectCount}</p>
-          <div className="mt-6">
-            <h3 className="text-xl font-bold">Review Your Answers</h3>
-            <ul className="mt-4">
-              {submittedAnswers.map((answer, index) => (
-                <li key={index} className="mb-4">
-                  <div className="flex items-center">
-                    <span className="mr-2">{index + 1}.</span>
-                    <MathJax.Text text={lessonQuestions[index].question} />
-                  </div>
-                  <div className={`mt-2 p-2 rounded-md ${answer.isCorrect ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>
-                    Your answer: <MathJax.Text text={answer.answer} /> - {answer.isCorrect ? 'Correct' : `Incorrect, the correct answer is `}
-                    <MathJax.Text text={lessonQuestions[index].correctAnswer} />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
       </MathJax.Context>
     );
@@ -227,15 +141,22 @@ function PreTest({ lessonNumber }) {
   if (hasCompletedPreTest) {
     return (
       <div className="bg-blue-200 p-6 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold">Pre-test Already Completed</h2>
+        <h2 className="text-2xl font-bold">Pre-Test Completed</h2>
         <p className="mt-4">You have already completed the pre-test for Lesson {lessonNumber}.</p>
-        {renderResults(completedTestData)}
-        <button
-          onClick={() => navigate('/dashboard')}
-          className="mt-6 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-        >
-          Go to Dashboard
-        </button>
+        <div className="mt-6 flex justify-between">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          >
+            Go to Dashboard
+          </button>
+          <button
+            onClick={() => navigate(`/lesson/${lessonNumber}/subtopic/1`)}
+            className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+          >
+            Next
+          </button>
+        </div>
       </div>
     );
   }
@@ -277,14 +198,7 @@ function PreTest({ lessonNumber }) {
           {!isFinished ? (
             <>
               {renderQuestion()}
-              <div className="mt-6 flex justify-between">
-                <button
-                  onClick={handlePreviousQuestion}
-                  className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
-                  disabled={currentQuestionIndex === 0}
-                >
-                  Previous
-                </button>
+              <div className="mt-6 flex justify-end">
                 <button
                   onClick={isSubmitted ? handleNextQuestion : handleSubmitAnswer}
                   className={`px-4 py-2 rounded-md ${isSubmitEnabled ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-red-500 text-white cursor-not-allowed'}`}
@@ -295,7 +209,24 @@ function PreTest({ lessonNumber }) {
               </div>
             </>
           ) : (
-            renderResults({ correctCount, incorrectCount, submittedAnswers })
+            <div>
+              <h2 className="text-2xl font-bold">Test Completed</h2>
+              <p className="mt-4">Total Score: {correctCount} out of 5</p>
+              <div className="mt-6 flex justify-between">
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                >
+                  Go to Dashboard
+                </button>
+                <button
+                  onClick={() => navigate(`/lesson/${lessonNumber}/subtopic/1`)}
+                  className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </section>

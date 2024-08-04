@@ -41,8 +41,8 @@ const Profile = () => {
             const lessonData = lessonDocSnap.data();
             scoresData.push({
               lesson: lessonNumber,
-              preTestScore: lessonData.PreTestScores?.correctCount ?? 'Not yet taken',
-              postTestScore: lessonData.PostTestScores?.correctCount ?? 'Not yet taken',
+              preTestScore: lessonData.pre_test_scores ?? 'Not yet taken',
+              postTestScore: lessonData.post_test_score ?? 'Not yet taken',
               knowledgeLevel: lessonData.knowledgeLevel ?? 'N/A',
             });
           } else {

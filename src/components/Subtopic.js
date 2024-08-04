@@ -74,6 +74,7 @@ function Subtopic({ lessonNumber, subtopic }) {
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const { subtopicIndex } = useParams();
+  const navigate = useNavigate();
 
   const subtopics = Object.keys(contentFiles[lessonNumber]);
   const currentIndex = subtopics.indexOf(subtopic);
@@ -166,6 +167,14 @@ function Subtopic({ lessonNumber, subtopic }) {
     return audioKey ? audioFiles[lessonNumber][audioKey] : null;
   };
 
+  const handleButtonClick = () => {
+    if (lessonNumber === "1" && currentIndex === 0) {
+      navigate(`/lesson/1/subtopic/2`);
+    } else {
+      navigate(`/lesson/${lessonNumber}/post-test`);
+    }
+  };
+
   return (
     <div className="flex flex-col h-full">
       {isLoading ? (
@@ -242,6 +251,14 @@ function Subtopic({ lessonNumber, subtopic }) {
               )}
             </div>
           </section>
+          <footer className="flex justify-end p-4 bg-gray-100">
+            <button
+              onClick={handleButtonClick}
+              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+            >
+              {lessonNumber === "1" && currentIndex === 0 ? "Next Topic" : "Take Post-Test"}
+            </button>
+          </footer>
         </>
       )}
     </div>
