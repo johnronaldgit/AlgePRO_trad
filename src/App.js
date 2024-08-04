@@ -18,7 +18,7 @@ import Profile from './components/Profile'; // Import the Profile component
 const lessons = [
   {
     number: '1',
-    subtopics: ['Special Products', 'Square of Binomials'],
+    subtopics: ['Square of Binomials'],
   },
   {
     number: '2',

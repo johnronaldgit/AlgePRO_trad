@@ -14,7 +14,6 @@ import algeprologo from '../assets/algeprologo.png'; // Ensure you have this pat
 
 const contentFiles = {
   "1": {
-    "Special Products": "/content/lesson1_special_products.md",
     "Square Of Binomials": "/content/lesson1_square_of_binomials.md",
   },
   "2": {
@@ -33,7 +32,6 @@ const contentFiles = {
 
 const pdfFiles = {
   "1": {
-    "Special Products": "/pdfs/lesson1_special_products.pdf",
     "Square Of Binomials": "/pdfs/lesson1_square_of_binomials.pdf",
   },
   "2": {
@@ -52,7 +50,6 @@ const pdfFiles = {
 
 const audioFiles = {
   "1": {
-    "Special Products": "/audio/lesson1_special_products.mp3",
     "Square Of Binomials": "/audio/lesson1_square_of_binomials.mp3",
   },
   "2": {
