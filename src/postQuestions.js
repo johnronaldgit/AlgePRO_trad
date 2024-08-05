@@ -50,56 +50,6 @@ const postQuestions = {
         "d) \\(0.9025x^2 + 4.75x + 25\\)"
       ],
       correctAnswer: "b) \\(0.9025x^2 + 9.5x + 25\\)"
-    },
-    {
-      question: "Find the product of \\((4x + 2)(4x + 2)\\).",
-      options: [
-        "a) \\(16x^2 + 8x + 4\\)", 
-        "b) \\(16x^2 + 16x + 4\\)", 
-        "c) \\(16x^2 + 32x + 4\\)", 
-        "d) \\(16x^2 + 4\\)"
-      ],
-      correctAnswer: "b) \\(16x^2 + 16x + 4\\)"
-    },
-    {
-      question: "Find the product of \\((x − 6)(x − 6)\\).",
-      options: [
-        "a) \\(x^2 + 6x + 36\\)", 
-        "b) \\(x^2 − 6x + 36\\)", 
-        "c) \\(x^2 + 12x + 36\\)", 
-        "d) \\(x^2 − 12x + 36\\)"
-      ],
-      correctAnswer: "d) \\(x^2 − 12x + 36\\)"
-    },
-    {
-      question: "Find the product of \\((0.3x + 0.9)(0.3x + 0.9)\\).",
-      options: [
-        "a) \\(0.09x^2 + 0.27x + 0.81\\)", 
-        "b) \\(0.9x^2 + 0.54x + 0.81\\)", 
-        "c) \\(0.9x^2 + 0.27x + 0.81\\)", 
-        "d) \\(0.09x^2 + 0.54x + 0.81\\)"
-      ],
-      correctAnswer: "d) \\(0.09x^2 + 0.54x + 0.81\\)"
-    },
-    {
-      question: "Find the product of \\((0.16x − 0.49)(0.16x − 0.49)\\).",
-      options: [
-        "a) \\(0.256x^2 − 0.0784x + 0.2401\\)", 
-        "b) \\(0.256x^2 − 0.1568x + 0.2401\\)", 
-        "c) \\(0.0256x^2 − 0.0784x + 0.2401\\)", 
-        "d) \\(0.0256x^2 − 0.1568x + 0.2401\\)"
-      ],
-      correctAnswer: "d) \\(0.0256x^2 − 0.1568x + 0.2401\\)"
-    },
-    {
-      question: "Find the product of \\((−9x + \\frac{9}{16})(−9x + \\frac{9}{16})\\).",
-      options: [
-        "a) \\(81x^2 + 10.125x + \\frac{81}{256}\\)", 
-        "b) \\(81x^2 − 10.125x + \\frac{81}{256}\\)", 
-        "c) \\(81x^2 + 5.0625x + \\frac{81}{256}\\)", 
-        "d) \\(81x^2 − 5.0625x + \\frac{81}{256}\\)"
-      ],
-      correctAnswer: "b) \\(81x^2 − 10.125x + \\frac{81}{256}\\)"
     }
   ],  
   lesson2: [
@@ -152,56 +102,6 @@ const postQuestions = {
         "d) \\(0.01a^2 + 4b^2 + 9c^2 + 0.4ab + 0.6ac + 12bc\\)"
       ],
       correctAnswer: "c) \\(0.01a^2 + 4b^2 + 9c^2 + 0.4ab - 0.6ac - 12bc\\)"
-    },
-    {
-      question: "Factor the expression \\(y^2 − 14y + 49\\).",
-      options: [
-        "a) Not a perfect square", 
-        "b) \\((y − 7)^2\\)", 
-        "c) \\((y + 7)^2\\)", 
-        "d) \\((y + 7)(y − 7)\\)"
-      ],
-      correctAnswer: "b) \\((y − 7)^2\\)"
-    },
-    {
-      question: "Factor the expression \\(25x^2 − 30x + 9\\).",
-      options: [
-        "a) \\((5x + 3)^2\\)", 
-        "b) Not a perfect square", 
-        "c) \\((5x − 3)^2\\)", 
-        "d) \\((5x + 3)(5x − 3)\\)"
-      ],
-      correctAnswer: "c) \\((5x − 3)^2\\)"
-    },
-    {
-      question: "Factor the expression \\(9b^2 + 6b + 1\\).",
-      options: [
-        "a) \\((3b + 1)(3b − 1)\\)", 
-        "b) \\((3b + 1)^2\\)", 
-        "c) Not a perfect square", 
-        "d) \\((3b − 1)^2\\)"
-      ],
-      correctAnswer: "b) \\((3b + 1)^2\\)"
-    },
-    {
-      question: "Factor the expression \\(16n^2 − 40n + 25\\).",
-      options: [
-        "a) \\((4n − 5)^2\\)", 
-        "b) \\((4n + 5)^2\\)", 
-        "c) \\((4n + 5)(4n − 5)\\)", 
-        "d) Not a perfect square"
-      ],
-      correctAnswer: "a) \\((4n − 5)^2\\)"
-    },
-    {
-      question: "Factor the expression \\(x^2 − 4xy + 4y^2\\).",
-      options: [
-        "a) Not a perfect square", 
-        "b) \\((x + 2y)^2\\)", 
-        "c) \\((x − 2y)^2\\)", 
-        "d) \\((x + 2y)(x − 2y)\\)"
-      ],
-      correctAnswer: "c) \\((x − 2y)^2\\)"
     }
   ],
   lesson3: [
@@ -214,16 +114,6 @@ const postQuestions = {
         "d) \\(10m^2 + 16\\)"
       ],
       correctAnswer: "a) \\(25m^2 − 64\\)"
-    },
-    {
-      question: "Simplify the expression \\((3p + 7)(3p − 7)\\).",
-      options: [
-        "a) \\(6p^2 − 49\\)", 
-        "b) \\(9p^2 − 49\\)", 
-        "c) \\(6p^2 + 49\\)", 
-        "d) \\(6p^2 − 49\\)"
-      ],
-      correctAnswer: "b) \\(9p^2 − 49\\)"
     },
     {
       question: "Find the missing term: \\((6x^2 + 2)(6x^2 − 2) = −4 + \\) _____",
@@ -256,46 +146,6 @@ const postQuestions = {
       correctAnswer: "a) \\(100m^2 − 9\\)"
     },
     {
-      question: "Find the result of \\((2x + 9)(2x − 9)\\).",
-      options: [
-        "a) \\(4x^2 − 81x\\)", 
-        "b) \\(4x^2 + 81x\\)", 
-        "c) \\(4x^2 − 81\\)", 
-        "d) \\(4x^2 + 81\\)"
-      ],
-      correctAnswer: "c) \\(4x^2 − 81\\)"
-    },
-    {
-      question: "What is the value of \\((8y + 1)(8y − 1)\\)?",
-      options: [
-        "a) \\(64y^2 − 1\\)", 
-        "b) \\(64y^2 + 1\\)", 
-        "c) \\(8y^2 − 1\\)", 
-        "d) \\(8y^2 + 1\\)"
-      ],
-      correctAnswer: "a) \\(64y^2 − 1\\)"
-    },
-    {
-      question: "Simplify \\((2z + 10)(2z − 10)\\).",
-      options: [
-        "a) \\(20z + 100\\)", 
-        "b) \\(20z − 100\\)", 
-        "c) \\(4z^2 + 100\\)", 
-        "d) \\(4z^2 − 100\\)"
-      ],
-      correctAnswer: "d) \\(4z^2 − 100\\)"
-    },
-    {
-      question: "What is the simplified form of \\((x − 4y)(x + 4y)\\)?",
-      options: [
-        "a) \\(x^2 − 16y\\)", 
-        "b) \\(x^2 + 16y\\)", 
-        "c) \\(x^2 − 4y\\)", 
-        "d) \\(x^2 + 4y\\)"
-      ],
-      correctAnswer: "a) \\(x^2 − 16y\\)"
-    },
-    {
       question: "Calculate the product \\((7a + 2b)(7a − 2b)\\).",
       options: [
         "a) \\(14ab + 4\\)", 
@@ -308,16 +158,6 @@ const postQuestions = {
   ],
   lesson4: [
     {
-      question: "Expand the expression \\((x + 2)^3\\).",
-      options: [
-        "a) \\(x^3 + 6x^2 + 12x + 8\\)", 
-        "b) \\(x^3 + 6x^2 + 4x + 8\\)", 
-        "c) \\(x^3 − 6x^2 + 12x − 8\\)", 
-        "d) \\(x^3 − 6x^2 − 12x + 8\\)"
-      ],
-      correctAnswer: "a) \\(x^3 + 6x^2 + 12x + 8\\)"
-    },
-    {
       question: "Expand the expression \\((5 − 2y)^3\\).",
       options: [
         "a) \\(125 + 150y − 60y + 8y^3\\)", 
@@ -326,16 +166,6 @@ const postQuestions = {
         "d) \\(125 + 75y + 30y^2 + 8y^3\\)"
       ],
       correctAnswer: "c) \\(125 − 150y + 60y − 8y^3\\)"
-    },
-    {
-      question: "Expand the expression \\((2p + 1)^3\\).",
-      options: [
-        "a) \\(8p^3 + 12p^2 + 6p + 1\\)", 
-        "b) \\(8p^3 + 4p^2 + 2p + 1\\)", 
-        "c) \\(8p^3 − 12p^2 + 6p − 1\\)", 
-        "d) \\(8p^3 − 4p^2 + 2p − 1\\)"
-      ],
-      correctAnswer: "a) \\(8p^3 + 12p^2 + 6p + 1\\)"
     },
     {
       question: "Expand the expression \\((4a + 5)^3\\).",
@@ -368,26 +198,6 @@ const postQuestions = {
       correctAnswer: "a) \\(-108p^2q\\)"
     },
     {
-      question: "Expand and find the 3rd term of \\((x + 5y)^3\\).",
-      options: [
-        "a) \\(15xy^2\\)", 
-        "b) \\(15x^2y\\)", 
-        "c) \\(75x^2y\\)", 
-        "d) \\(75xy^2\\)"
-      ],
-      correctAnswer: "d) \\(75xy^2\\)"
-    },
-    {
-      question: "Expand and find the coefficient of the 1st and 3rd terms of \\((a − 3b)^3\\).",
-      options: [
-        "a) 1, -27", 
-        "b) 1, 27", 
-        "c) 1, -9", 
-        "d) 1, 9"
-      ],
-      correctAnswer: "b) 1, 27"
-    },
-    {
       question: "Expand and find the coefficient of the 2nd and 3rd terms of \\((2x − 5)^3\\).",
       options: [
         "a) -60, 150", 
@@ -396,16 +206,6 @@ const postQuestions = {
         "d) 8, 125"
       ],
       correctAnswer: "a) -60, 150"
-    },
-    {
-      question: "Expand and find the 4th term of \\((7y + 2)^3\\).",
-      options: [
-        "a) -84", 
-        "b) 84", 
-        "c) -8", 
-        "d) 8"
-      ],
-      correctAnswer: "d) 8"
     }
   ], 
   lesson5: [
@@ -420,36 +220,6 @@ const postQuestions = {
       correctAnswer: "b) \\(x^3 + 8\\)"
     },
     {
-      question: "Simplify the expression \\((y − 1)(y^2 + y + 1)\\).",
-      options: [
-        "a) \\(y^3 + 1\\)", 
-        "b) \\(y^3 − 2y^2 − 2y + 1\\)", 
-        "c) \\(y^3 + 2y^2 + 2y − 1\\)", 
-        "d) \\(y^3 − 1\\)"
-      ],
-      correctAnswer: "d) \\(y^3 − 1\\)"
-    },
-    {
-      question: "Simplify the expression \\((2y + 1)(4y^2 − 2y + 1)\\).",
-      options: [
-        "a) \\(8y^3 + 1\\)", 
-        "b) \\(8y^3 − 1\\)", 
-        "c) \\(8y^3 − 8y^2 − 4y + 1\\)", 
-        "d) \\(8y^3 + 8y^2 + 4y − 1\\)"
-      ],
-      correctAnswer: "a) \\(8y^3 + 1\\)"
-    },
-    {
-      question: "Simplify the expression \\((x − 3)(x^2 + 3x + 9)\\).",
-      options: [
-        "a) \\(x^3 − 27\\)", 
-        "b) \\(x^3 + 27\\)", 
-        "c) \\(x^3 − 6x^2 − 18x + 27\\)", 
-        "d) \\(x^3 + 6x^2 + 18x − 27\\)"
-      ],
-      correctAnswer: "a) \\(x^3 − 27\\)"
-    },
-    {
       question: "Simplify the expression \\((3x − 4)(9x^2 + 12x + 16)\\).",
       options: [
         "a) \\(27x^3 + 64\\)", 
@@ -458,26 +228,6 @@ const postQuestions = {
         "d) \\(−24x^3 − 64\\)"
       ],
       correctAnswer: "b) \\(27x^3 − 64\\)"
-    },
-    {
-      question: "Complete the missing expression: \\((x + 3)(x^2 − 3x + 9) = x^3\\) _____",
-      options: [
-        "a) \\(+ 3x^2 − 9x + 27\\)", 
-        "b) \\(− 3x^2 − 9x + 27\\)", 
-        "c) \\(− 27\\)", 
-        "d) \\(+ 27\\)"
-      ],
-      correctAnswer: "d) \\(+ 27\\)"
-    },
-    {
-      question: "Complete the missing expression: \\((3x + 4)(9x^2 − 12x + 16) = 27x^3\\) _____",
-      options: [
-        "a) \\(− 64\\)", 
-        "b) \\(+ 64\\)", 
-        "c) \\(+ 16\\)", 
-        "d) \\(− 16\\)"
-      ],
-      correctAnswer: "b) \\(+ 64\\)"
     },
     {
       question: "Find the missing term to make it a perfect cube: \\((x + 2)(x^2 + 4x + \\) _____).",
