@@ -18,7 +18,7 @@ function PracticeQuestions({ lessonNumber }) {
   const [remainingQuestions, setRemainingQuestions] = useState([]);
   const [floatingButtonDisabled, setFloatingButtonDisabled] = useState(true); // State to manage FloatingButton
   const floatingButtonRef = useRef(null); // Reference to FloatingButton
-  const [isHelpButtonDisabled, setIsHelpButtonDisabled] = useState(false); // State to manage "Ask for Help?" button
+  const [showHelpButton, setShowHelpButton] = useState(true); // State to manage "Ask for Help?" button visibility
 
   const fetchKnowledgeLevel = useCallback(async () => {
     const user = auth.currentUser;
@@ -88,9 +88,10 @@ function PracticeQuestions({ lessonNumber }) {
     setIsSubmitted(true);
     if (!isCorrect) {
       setFloatingButtonDisabled(false); // Enable FloatingButton if the answer is incorrect
-    }
-    if (isCorrect) {
+      setShowHelpButton(true); // Show "Ask for Help?" button
+    } else {
       setCorrectCount((prevCount) => prevCount + 1);
+      setShowHelpButton(false); // Hide "Ask for Help?" button if the answer is correct
     }
   };
 
@@ -101,7 +102,6 @@ function PracticeQuestions({ lessonNumber }) {
     setIsSubmitted(false);
     setIsSubmitEnabled(false);
     setFloatingButtonDisabled(true); // Disable FloatingButton when moving to the next question
-    setIsHelpButtonDisabled(false); // Re-enable "Ask for Help?" button for the new question
 
     if (newRemainingQuestions.length === 0) {
       setIsFinished(true);
@@ -111,7 +111,7 @@ function PracticeQuestions({ lessonNumber }) {
   const handleAskForHelp = async () => {
     if (floatingButtonRef.current) {
       floatingButtonRef.current.toggleWindow();
-      setIsHelpButtonDisabled(true);
+      setShowHelpButton(false); // Hide "Ask for Help?" button after clicking it
 
       const helpMessage = `I need help with the following question: ${currentQuestion.question}`;
       const user = auth.currentUser;
@@ -217,11 +217,10 @@ function PracticeQuestions({ lessonNumber }) {
             </div>
           )}
           <div className="mt-6 flex justify-end items-center">
-            {isSubmitted && !isCorrect && (
+            {isSubmitted && !isCorrect && showHelpButton && (
               <button
                 onClick={handleAskForHelp}
                 className="mr-4 p-2 bg-yellow-500 text-white rounded-md"
-                disabled={isHelpButtonDisabled}
               >
                 Ask for Help?
               </button>
