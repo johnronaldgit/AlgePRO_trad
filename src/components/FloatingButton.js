@@ -24,7 +24,7 @@ const FloatingButton = forwardRef((props, ref) => {
   }));
 
   // Check if the current path includes "pre-test", "post-test", "login", "register", or is exactly "/"
-  const isExcludedPage = location.pathname === '/' || location.pathname.includes('pre-test') || location.pathname.includes('post-test') || location.pathname.includes('login') || location.pathname.includes('register');
+  const isExcludedPage = location.pathname === '/' || location.pathname.includes('pre-test') || location.pathname.includes('post-test') || location.pathname.includes('login') || location.pathname.includes('register')|| location.pathname.includes('profile')|| location.pathname.includes('about')|| location.pathname.includes('help')|| location.pathname.includes('dashboard')|| location.pathname.includes('lesson');
 
   // Render the button and window only if not on excluded pages
   if (isExcludedPage) {

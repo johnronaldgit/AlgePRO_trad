@@ -94,12 +94,6 @@ function Dashboard() {
     }
   };
 
-  const handleTalkToAlgePRO = () => {
-    if (floatingButtonRef.current) {
-      floatingButtonRef.current.toggleWindow();
-    }
-  };
-
   return (
     <div className="min-h-screen bg-white text-navy-blue flex flex-col items-center overflow-x-hidden">
       <div 
@@ -121,12 +115,6 @@ function Dashboard() {
                 onClick={handleStartLearning}
               >
                 {currentTopic === 'Finished' ? 'All lessons completed' : `Go to ${currentTopic}`}
-              </button>
-              <button
-                className="px-4 py-2 sm:px-6 sm:py-3 bg-transparent border border-yellow-400 text-yellow-400 font-semibold rounded-lg shadow-lg hover:bg-yellow-300 hover:text-black w-full sm:w-auto"
-                onClick={handleTalkToAlgePRO}
-              >
-                Talk to AlgePRO!
               </button>
             </div>
           </header>

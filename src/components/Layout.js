@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { auth, db } from '../firebaseConfig';
-import { getDoc, doc } from 'firebase/firestore';
+import { getDoc, doc, updateDoc } from 'firebase/firestore';
 import { ChevronDownIcon, ChevronRightIcon, HomeIcon, BookOpenIcon, BoltIcon, DocumentTextIcon, LockClosedIcon } from '@heroicons/react/20/solid';
 import 'tailwindcss/tailwind.css';
 import Navbar from './Navbar';
@@ -83,6 +83,27 @@ function Layout() {
   const getLessonPath = (lessonNumber) => lessonNumber.includes('&') ? lessonNumber.replace(' & ', '-') : lessonNumber;
 
   const toggleSidebar = () => setSidebarVisible(!sidebarVisible);
+
+  const unlockNextLesson = async (currentLessonNumber) => {
+    const nextLessonNumber = parseInt(currentLessonNumber) + 1;
+    if (!unlockedLessons.includes(nextLessonNumber)) {
+      try {
+        const userDocRef = doc(db, 'users', userEmail);
+        const newUnlockedLessons = [...unlockedLessons, nextLessonNumber];
+        await updateDoc(userDocRef, { unlockedLessons: newUnlockedLessons });
+        setUnlockedLessons(newUnlockedLessons);
+      } catch (error) {
+        console.error('Error unlocking next lesson:', error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const lessonNumber = location.pathname.split('/')[2];
+    if (lessonNumber && location.pathname.includes('post-test')) {
+      unlockNextLesson(lessonNumber);
+    }
+  }, [location]);
 
   return (
     <div className="flex h-screen overflow-hidden">

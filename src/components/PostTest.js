@@ -234,38 +234,7 @@ function PostTest({ lessonNumber }) {
     );
   }
 
-  if (isFinished && didPass === false) {
-    return (
-      <div className="bg-red-200 p-6 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold">Post-test Not Passed</h2>
-        <p className="mt-4">You did not pass the post-test for Lesson {lessonNumber}.</p>
-        <p className="mt-2">Total Score: {correctCount} out of 5</p>
-        <p className="mt-2">You need to score at least 4 out of 5 to pass.</p>
-        <div className="mt-6 flex justify-between">
-          <button
-            onClick={() => navigate(`/lesson/${lessonNumber}/subtopic/1`)}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-          >
-            Review Lesson
-          </button>
-          <button
-            onClick={() => navigate(`/lesson/${lessonNumber}/practice`)}
-            className="px-4 py-2 bg-yellow-500 text-black rounded-md hover:bg-yellow-600"
-          >
-            Practice Questions
-          </button>
-          <button
-            onClick={handleRetakeTest}
-            className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
-          >
-            Take Post-Test Again
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (hasCompletedPostTest && didPass) {
+  if (hasCompletedPostTest) {
     return (
       <div className="bg-blue-200 p-6 rounded-lg shadow-md">
         {renderResults(completedTestData)}

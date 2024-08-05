@@ -4,13 +4,13 @@ import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
-    apiKey: "AIzaSyB9eyk2h_oJntaz1C8BXx6_UGLSRgGKBok",
-    authDomain: "algepro-new-4a0cd.firebaseapp.com",
-    projectId: "algepro-new-4a0cd",
-    storageBucket: "algepro-new-4a0cd.appspot.com",
-    messagingSenderId: "837238006391",
-    appId: "1:837238006391:web:b6d360cf45e6fde7489c72"
-};
+    apiKey: "AIzaSyA5vj4NFXEPYAdBDbH0aGzp32lKBu-1pLo",
+    authDomain: "algepro-trad.firebaseapp.com",
+    projectId: "algepro-trad",
+    storageBucket: "algepro-trad.appspot.com",
+    messagingSenderId: "61261112303",
+    appId: "1:61261112303:web:a6f2ef0dbce79857c8cc1a"
+  };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
