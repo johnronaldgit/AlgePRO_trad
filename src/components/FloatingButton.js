@@ -6,6 +6,7 @@ import FloatingWindow from './FloatingWindow'; // Import the FloatingWindow comp
 const FloatingButton = forwardRef((props, ref) => {
   const [showWindow, setShowWindow] = useState(false);
   const location = useLocation();
+  const windowRef = React.useRef();
 
   const toggleWindow = () => {
     if (!props.disabled) {
@@ -14,7 +15,12 @@ const FloatingButton = forwardRef((props, ref) => {
   };
 
   useImperativeHandle(ref, () => ({
-    toggleWindow
+    toggleWindow,
+    addMessage: (message) => {
+      if (windowRef.current) {
+        windowRef.current.addMessage(message);
+      }
+    },
   }));
 
   // Check if the current path includes "pre-test", "post-test", "login", "register", or is exactly "/"
@@ -34,7 +40,7 @@ const FloatingButton = forwardRef((props, ref) => {
       >
         <img src="/algeprologo.png" alt="AlgePRO Logo" className="w-10 h-10" />
       </button>
-      {showWindow && !props.disabled && <FloatingWindow onClose={toggleWindow} />} {/* Render FloatingWindow conditionally */}
+      {showWindow && !props.disabled && <FloatingWindow ref={windowRef} onClose={toggleWindow} />} {/* Render FloatingWindow conditionally */}
     </>
   );
 });

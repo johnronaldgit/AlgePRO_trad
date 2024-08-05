@@ -115,18 +115,31 @@ function PostTest({ lessonNumber }) {
     setIncorrectCount(incorrect);
   };
 
+  const determineKnowledgeLevel = (score) => {
+    if (score >= 0 && score <= 1) {
+      return 'Beginner';
+    } else if (score >= 2 && score <= 3) {
+      return 'Intermediate';
+    } else if (score >= 4 && score <= 5) {
+      return 'Advanced';
+    }
+    return null;
+  };
+
   const saveScore = async (passed, score) => {
     const user = auth.currentUser;
     if (user) {
       const userEmail = user.email;
       const lesson = `lesson${lessonNumber}`;
       const scoresRef = doc(db, 'users', userEmail, 'scores', lesson);
+      const knowledgeLevel = determineKnowledgeLevel(score);
 
       try {
         setSaving(true);
         await setDoc(scoresRef, {
           post_test_score: score,
-          didPass: passed // Save pass/fail status
+          didPass: passed, // Save pass/fail status
+          knowledgeLevel: knowledgeLevel // Save knowledge level
         }, { merge: true });
 
         console.log('Post-test score saved successfully');

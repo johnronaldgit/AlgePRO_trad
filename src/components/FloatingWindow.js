@@ -1,11 +1,11 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useImperativeHandle, forwardRef } from 'react';
 import 'tailwindcss/tailwind.css';
 import { TrashIcon } from '@heroicons/react/24/solid';
 import { auth, db } from '../firebaseConfig';
 import { collection, addDoc, getDocs, query, orderBy, writeBatch } from 'firebase/firestore';
 import MathJax from 'react-mathjax2';
 
-const FloatingWindow = ({ onClose }) => {
+const FloatingWindow = forwardRef(({ onClose }, ref) => {
   const [dimensions, setDimensions] = useState({ width: 384, height: 500 });
   const [isResizing, setIsResizing] = useState(false);
   const [resizeDirection, setResizeDirection] = useState(null);
@@ -150,6 +150,12 @@ const FloatingWindow = ({ onClose }) => {
     setMessages([]);
   };
 
+  useImperativeHandle(ref, () => ({
+    addMessage: (message) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    },
+  }));
+
   return (
     <div
       ref={windowRef}
@@ -181,13 +187,9 @@ const FloatingWindow = ({ onClose }) => {
                     {message.role === 'user' ? 'User' : 'AlgePRO'}
                   </div>
                   <div className={`p-2 rounded-lg ${message.role === 'user' ? 'bg-blue-500 text-white self-end rounded-2xl' : 'bg-gray-300 text-black self-start rounded-2xl'}`}>
-                    {message.role === 'assistant' ? (
-                      <MathJax.Context input="tex">
-                        <MathJax.Text text={message.content} />
-                      </MathJax.Context>
-                    ) : (
-                      message.content
-                    )}
+                    <MathJax.Context input="tex">
+                      <MathJax.Text text={message.content} />
+                    </MathJax.Context>
                   </div>
                 </div>
               ))}
@@ -223,6 +225,6 @@ const FloatingWindow = ({ onClose }) => {
       ></div>
     </div>
   );
-};
+});
 
 export default FloatingWindow;

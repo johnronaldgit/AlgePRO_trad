@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import MathJax from 'react-mathjax2';
 import { db, auth } from '../firebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, addDoc } from 'firebase/firestore';
 import questions from '../practice_questions.json'; // Import questions from the separate file
 import FloatingButton from './FloatingButton'; // Import FloatingButton
 
@@ -17,6 +17,8 @@ function PracticeQuestions({ lessonNumber }) {
   const [isLoading, setIsLoading] = useState(true);
   const [remainingQuestions, setRemainingQuestions] = useState([]);
   const [floatingButtonDisabled, setFloatingButtonDisabled] = useState(true); // State to manage FloatingButton
+  const floatingButtonRef = useRef(null); // Reference to FloatingButton
+  const [isHelpButtonDisabled, setIsHelpButtonDisabled] = useState(false); // State to manage "Ask for Help?" button
 
   const fetchKnowledgeLevel = useCallback(async () => {
     const user = auth.currentUser;
@@ -99,9 +101,75 @@ function PracticeQuestions({ lessonNumber }) {
     setIsSubmitted(false);
     setIsSubmitEnabled(false);
     setFloatingButtonDisabled(true); // Disable FloatingButton when moving to the next question
+    setIsHelpButtonDisabled(false); // Re-enable "Ask for Help?" button for the new question
 
     if (newRemainingQuestions.length === 0) {
       setIsFinished(true);
+    }
+  };
+
+  const handleAskForHelp = async () => {
+    if (floatingButtonRef.current) {
+      floatingButtonRef.current.toggleWindow();
+      setIsHelpButtonDisabled(true);
+
+      const helpMessage = `I need help with the following question: ${currentQuestion.question}`;
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const userRef = collection(db, 'users', user.email, 'messages');
+
+      // Save the help message to Firebase
+      await addDoc(userRef, {
+        role: 'user',
+        content: helpMessage,
+        timestamp: new Date(),
+      });
+
+      // Send the help message to the backend
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ messages: [{ role: 'user', content: helpMessage }] }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Network response was not ok: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const responseMessage = { role: 'assistant', content: data.message };
+
+        // Save the assistant's response to Firebase
+        await addDoc(userRef, {
+          role: 'assistant',
+          content: responseMessage.content,
+          timestamp: new Date(),
+        });
+
+        // Update the messages in the FloatingWindow
+        if (floatingButtonRef.current) {
+          floatingButtonRef.current.addMessage(responseMessage);
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+        const errorMessage = { role: 'assistant', content: 'Sorry, something went wrong. Please try again later.' };
+
+        await addDoc(userRef, {
+          role: 'assistant',
+          content: errorMessage.content,
+          timestamp: new Date(),
+        });
+
+        // Update the messages in the FloatingWindow
+        if (floatingButtonRef.current) {
+          floatingButtonRef.current.addMessage(errorMessage);
+        }
+      }
     }
   };
 
@@ -150,7 +218,11 @@ function PracticeQuestions({ lessonNumber }) {
           )}
           <div className="mt-6 flex justify-end items-center">
             {isSubmitted && !isCorrect && (
-              <button className="mr-4 p-2 bg-yellow-500 text-white rounded-md">
+              <button
+                onClick={handleAskForHelp}
+                className="mr-4 p-2 bg-yellow-500 text-white rounded-md"
+                disabled={isHelpButtonDisabled}
+              >
                 Ask for Help?
               </button>
             )}
@@ -243,7 +315,7 @@ function PracticeQuestions({ lessonNumber }) {
           )}
         </div>
       </section>
-      <FloatingButton disabled={floatingButtonDisabled} />
+      <FloatingButton ref={floatingButtonRef} disabled={floatingButtonDisabled} />
     </div>
   );
 }
