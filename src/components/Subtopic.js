@@ -1,9 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
-import 'katex/dist/katex.min.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../firebaseConfig';
@@ -12,39 +7,39 @@ import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 import algeprologo from '../assets/algeprologo.png'; // Ensure you have this path correct
 
-const contentFiles = {
+const readingPdfFiles = {
   "1": {
-    "Square Of Binomials": "/content/lesson1_square_of_binomials.md",
+    "Square Of Binomials": "/reading_pdfs/lesson1_square_of_binomials.pdf",
   },
   "2": {
-    "Square Of Trinomial": "/content/lesson2_square_of_trinomial.md",
+    "Square Of Trinomial": "/reading_pdfs/lesson2_square_of_trinomial.pdf",
   },
   "3": {
-    "The Product of a Sum and Difference of the Same Two Terms": "/content/lesson3_product_of_sum_and_difference.md",
+    "The Product of a Sum and Difference of the Same Two Terms": "/reading_pdfs/lesson3_product_of_sum_and_difference.pdf",
   },
   "4": {
-    "Cube Of Binomials": "/content/lesson4_cube_of_binomials.md",
+    "Cube Of Binomials": "/reading_pdfs/lesson4_cube_of_binomials.pdf",
   },
   "5": {
-    "Special Case on the Product of Binomial and Trinomial": "/content/lesson5_special_case_product.md",
+    "Special Case on the Product of Binomial and Trinomial": "/reading_pdfs/lesson5_special_case_product.pdf",
   },
 };
 
-const pdfFiles = {
+const visualPdfFiles = {
   "1": {
-    "Square Of Binomials": "/pdfs/lesson1_square_of_binomials.pdf",
+    "Square Of Binomials": "/visual_pdfs/lesson1_square_of_binomials.pdf",
   },
   "2": {
-    "Square Of Trinomial": "/pdfs/lesson2_square_of_trinomial.pdf",
+    "Square Of Trinomial": "/visual_pdfs/lesson2_square_of_trinomial.pdf",
   },
   "3": {
-    "The Product of a Sum and Difference of the Same Two Terms": "/pdfs/lesson3_product_of_sum_and_difference.pdf",
+    "The Product of a Sum and Difference of the Same Two Terms": "/visual_pdfs/lesson3_product_of_sum_and_difference.pdf",
   },
   "4": {
-    "Cube Of Binomials": "/pdfs/lesson4_cube_of_binomials.pdf",
+    "Cube Of Binomials": "/visual_pdfs/lesson4_cube_of_binomials.pdf",
   },
   "5": {
-    "Special Case on the Product of Binomial and Trinomial": "/pdfs/lesson5_special_case_product.pdf",
+    "Special Case on the Product of Binomial and Trinomial": "/visual_pdfs/lesson5_special_case_product.pdf",
   },
 };
 
@@ -68,12 +63,11 @@ const audioFiles = {
 
 function Subtopic({ lessonNumber, subtopic }) {
   const [selectedOption, setSelectedOption] = useState('');
-  const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const { subtopicIndex } = useParams();
   const navigate = useNavigate();
 
-  const subtopics = Object.keys(contentFiles[lessonNumber]);
+  const subtopics = Object.keys(readingPdfFiles[lessonNumber]);
   const currentIndex = subtopics.indexOf(subtopic);
   const nextSubtopic = currentIndex < subtopics.length - 1 ? subtopics[currentIndex + 1] : null;
 
@@ -103,35 +97,6 @@ function Subtopic({ lessonNumber, subtopic }) {
   }, []);
 
   useEffect(() => {
-    const loadContent = async () => {
-      const normalizedSubtopic = subtopic.toLowerCase().replace(/\s+/g, '');
-      const contentKey = Object.keys(contentFiles[lessonNumber]).find(key =>
-        key.toLowerCase().replace(/\s+/g, '') === normalizedSubtopic
-      );
-
-      if (contentKey) {
-        const contentUrl = contentFiles[lessonNumber][contentKey];
-        try {
-          const response = await fetch(contentUrl);
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          const text = await response.text();
-          setContent(text);
-        } catch (error) {
-          console.error(`Error fetching content: ${error.message}`);
-        }
-      } else {
-        console.error('Content key not found for subtopic:', subtopic);
-      }
-    };
-
-    if (selectedOption === 'Reading') {
-      loadContent();
-    }
-  }, [selectedOption, lessonNumber, subtopic]);
-
-  useEffect(() => {
     const updateAudioPlayer = () => {
       const audioElement = document.getElementById('audio-player');
       if (audioElement) {
@@ -148,12 +113,20 @@ function Subtopic({ lessonNumber, subtopic }) {
     setSelectedOption(event.target.value);
   };
 
-  const getPdfUrl = (lessonNumber, subtopic) => {
+  const getReadingPdfUrl = (lessonNumber, subtopic) => {
     const normalizedSubtopic = subtopic.toLowerCase().replace(/\s+/g, '');
-    const pdfKey = Object.keys(pdfFiles[lessonNumber]).find(key =>
+    const pdfKey = Object.keys(readingPdfFiles[lessonNumber]).find(key =>
       key.toLowerCase().replace(/\s+/g, '') === normalizedSubtopic
     );
-    return pdfKey ? pdfFiles[lessonNumber][pdfKey] : null;
+    return pdfKey ? readingPdfFiles[lessonNumber][pdfKey] : null;
+  };
+
+  const getVisualPdfUrl = (lessonNumber, subtopic) => {
+    const normalizedSubtopic = subtopic.toLowerCase().replace(/\s+/g, '');
+    const pdfKey = Object.keys(visualPdfFiles[lessonNumber]).find(key =>
+      key.toLowerCase().replace(/\s+/g, '') === normalizedSubtopic
+    );
+    return pdfKey ? visualPdfFiles[lessonNumber][pdfKey] : null;
   };
 
   const getAudioUrl = (lessonNumber, subtopic) => {
@@ -215,20 +188,25 @@ function Subtopic({ lessonNumber, subtopic }) {
             <div className="max-w-full">
               <h2 className="text-2xl font-bold text-center mb-4">{subtopic}</h2>
               {selectedOption === 'Reading' && (
-                <div className="markdown-body">
-                  <ReactMarkdown
-                    children={content}
-                    remarkPlugins={[remarkGfm, remarkMath]}
-                    rehypePlugins={[rehypeKatex]}
-                  />
+                <div className="flex flex-col items-center">
+                  {getReadingPdfUrl(lessonNumber, subtopic) ? (
+                    <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.worker.min.js">
+                      <Viewer
+                        fileUrl={getReadingPdfUrl(lessonNumber, subtopic)}
+                        defaultScale={SpecialZoomLevel.PageFit}
+                      />
+                    </Worker>
+                  ) : (
+                    <p>PDF not available for this subtopic.</p>
+                  )}
                 </div>
               )}
               {selectedOption === 'Visual' && (
-                <div className="flex justify-center">
-                  {getPdfUrl(lessonNumber, subtopic) ? (
+                <div className="flex flex-col items-center">
+                  {getVisualPdfUrl(lessonNumber, subtopic) ? (
                     <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.worker.min.js">
                       <Viewer
-                        fileUrl={getPdfUrl(lessonNumber, subtopic)}
+                        fileUrl={getVisualPdfUrl(lessonNumber, subtopic)}
                         defaultScale={SpecialZoomLevel.PageFit}
                       />
                     </Worker>
@@ -246,16 +224,16 @@ function Subtopic({ lessonNumber, subtopic }) {
                   </audio>
                 </div>
               )}
+              <div className="flex justify-end mt-4">
+                <button
+                  onClick={handleButtonClick}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                >
+                  {lessonNumber === "1" && currentIndex === 0 ? "Next Topic" : "Take Post-Test"}
+                </button>
+              </div>
             </div>
           </section>
-          <footer className="flex justify-end p-4 bg-gray-100">
-            <button
-              onClick={handleButtonClick}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-            >
-              {lessonNumber === "1" && currentIndex === 0 ? "Next Topic" : "Take Post-Test"}
-            </button>
-          </footer>
         </>
       )}
     </div>
